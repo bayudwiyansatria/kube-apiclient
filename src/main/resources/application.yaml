@@ -15,7 +15,10 @@ server:
 spring:
   application:
     name: bayudwiyansatria-springboot-boilerplate
-  cloud: { }
+  cloud:
+    kubernetes:
+      client:
+        kubeconfig-file: ${KUBERNETES_CONFIG_FILE_PATH:-}
   data:
     mongodb:
       host: ${MONGODB_HOST:localhost}
