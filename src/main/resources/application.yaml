@@ -1,0 +1,139 @@
+---
+#-----------------------------------------------------------------------------------------------------------------------
+# Server Config
+#-----------------------------------------------------------------------------------------------------------------------
+---
+server:
+  port: ${SERVER_PORT:80}
+  servlet:
+    context-path: ${SERVER_CONTEXT_PATH:}
+---
+#-----------------------------------------------------------------------------------------------------------------------
+# Spring Config
+#-----------------------------------------------------------------------------------------------------------------------
+---
+spring:
+  application:
+    name: bayudwiyansatria-springboot-boilerplate
+  cloud: { }
+  data:
+    mongodb:
+      host: ${MONGODB_HOST:localhost}
+      port: ${MONGODB_PORT:27017}
+      username: ${MONGODB_USERNAME:-}
+      password: ${MONGODB_PASSWORD:-}
+      database: ${MONGODB_DATABASE:-}
+      authentication-database: ${MONGODB_AUTHENTICATION_DATABASE:admin}
+      ssl:
+        enabled: ${MONGODB_SSL_ENABLED:false}
+        bundle: ${MONGODB_SSL_BUNDLE:-}
+      repositories:
+        type: ${MONGODB_REPOSITORIES_TYPE:auto}
+      auto-index-creation: ${MOGODB_AUTO_INDEX_CREATION:true}
+      replica-set-name: ${MONGODB_REPLICA_SET_NAME:-}
+  datasource:
+    url: ${DB_URL:jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;MODE=MYSQL}
+    driverClassName: ${DB_DRIVER:org.h2.Driver}
+    username: ${DB_USERNAME:-}
+    password: ${DB_PASSWORD:-}
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+  h2:
+    console:
+      enabled: true
+  main:
+    banner-mode: off
+    allow-bean-definition-overriding: true
+  profiles:
+    default: development
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 1MB
+      max-request-size: 10MB
+springdoc:
+  api-docs:
+    enabled: true
+  show-actuator: true
+  swagger-ui:
+    enabled: true
+    path: ${SWAGGER_PATH:/swagger}
+---
+#-----------------------------------------------------------------------------------------------------------------------
+# Management Config
+#-----------------------------------------------------------------------------------------------------------------------
+---
+management:
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health, loggers
+  endpoint:
+    health:
+      show-details: always
+  health:
+    mongo:
+      enabled: ${MONGO_HEALTH_ENABLED:false}
+---
+#-----------------------------------------------------------------------------------------------------------------------
+# Application Config
+#-----------------------------------------------------------------------------------------------------------------------
+---
+logging:
+  level:
+    org:
+      springframework: INFO
+      hibernate:
+        SQL: INFO
+        orm: ERROR
+      mongodb:
+        driver: WARN
+    com:
+      bayudwiyansatria: INFO
+  file:
+    name: ${logging.file.path}/spring.log
+    path: ${LOG_PATH:./.data/logs}
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%-5level] --- [%thread] %logger{36} : %msg%n"
+---
+#-----------------------------------------------------------------------------------------------------------------------
+# Override
+#-----------------------------------------------------------------------------------------------------------------------
+---
+spring:
+  config:
+    activate:
+      on-profile: development
+  data:
+    mongodb:
+      ssl:
+        enabled: false
+server:
+  port: ${SERVER_PORT:8080}
+logging:
+  level:
+    org:
+      springframework: INFO
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+---
+spring:
+  config:
+    activate:
+      on-profile: staging
+---
+spring:
+  config:
+    activate:
+      on-profile: production
+logging:
+  level:
+    org:
+      springframework: ERROR

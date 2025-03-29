@@ -1,0 +1,120 @@
+name: Main
+on:
+  push:
+    branches:
+    - master
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+  pages: write
+jobs:
+  #---------------------------------------------------------------------------------------------------------------------
+  # Build
+  #---------------------------------------------------------------------------------------------------------------------
+  build:
+    name: Build
+    uses: bayudwiyansatria/.github/.github/workflows/build-java-maven.yml@master
+    with:
+      JAVA_VERSION: 21
+      MAVEN_COMMAND: mvn --no-transfer-progress --file pom.xml --settings settings.xml clean package -DskipTests 
+    secrets:
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # Test
+  #---------------------------------------------------------------------------------------------------------------------
+  test:
+    name: Test
+    uses: bayudwiyansatria/.github/.github/workflows/build-java-maven.yml@master
+    with:
+      JAVA_VERSION: 21
+      MAVEN_COMMAND: mvn --no-transfer-progress --file pom.xml --settings settings.xml clean test verify
+      ARTIFACT_NAME: coverage
+      ARTIFACT_PATH: target/site/jacoco
+    secrets:
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # Documentation
+  #---------------------------------------------------------------------------------------------------------------------
+  docs:
+    name: Build Documentation
+    uses: bayudwiyansatria/.github/.github/workflows/build-java-maven.yml@master
+    with:
+      JAVA_VERSION: 21
+      MAVEN_COMMAND: mvn --no-transfer-progress --file pom.xml --settings settings.xml clean javadoc:javadoc
+      ARTIFACT_NAME: docs
+      ARTIFACT_PATH: target/site/apidocs
+    secrets:
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # Maven
+  #---------------------------------------------------------------------------------------------------------------------
+  maven-version:
+    name: Set Maven Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.versions.outputs.version }}
+    steps:
+    - name: Get Maven Version
+      id: versions
+      uses: bayudwiyansatria/.github/actions/maven-get-version@master
+      with:
+        java-version: 21
+  #---------------------------------------------------------------------------------------------------------------------
+  # Code Quality
+  #---------------------------------------------------------------------------------------------------------------------
+  code-quality:
+    name: Code Quality
+    needs: 
+    - test
+    uses: bayudwiyansatria/.github/.github/workflows/code-analysis-codecov.yml@master
+    with:
+      ARTIFACT_NAME: coverage
+      ARTIFACT_PATH: target/site/jacoco
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # Deploy
+  #---------------------------------------------------------------------------------------------------------------------
+  docker:
+    name: Docker
+    needs: 
+    - build
+    - maven-version
+    uses: bayudwiyansatria/.github/.github/workflows/build-docker.yml@master
+    with:
+      DOCKER_REGISTRY: docker.io
+      DOCKER_FILE: docker/ci.Dockerfile
+      DOCKER_IMAGE_TAG: ${{ needs.maven-version.outputs.version }}
+      DOCKER_BUILD_ARG: VERSION=${{ needs.maven-version.outputs.version }}
+      PUSH_ENABLED: true
+      ARTIFACT_ENABLED: true
+      ARTIFACT_NAME: target
+      ARTIFACT_PATH: target
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  deploy:
+    name: Deploy
+    uses: bayudwiyansatria/.github/.github/workflows/deploy-maven.yml@master
+    needs: 
+    - build
+    with:
+      JAVA_VERSION: 21
+    secrets:
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+  github-pages:
+    name: GitHub Pages
+    uses: bayudwiyansatria/.github/.github/workflows/release-github-pages.yml@master
+    needs: 
+    - build
+    with:
+      ARTIFACT_NAME: docs
+      ARTIFACT_PATH: target/site/apidocs
+      ARTIFACT_ROOT: target/site/apidocs
+    secrets:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}

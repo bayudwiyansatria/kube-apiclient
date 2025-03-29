@@ -1,0 +1,48 @@
+name: Features
+on:
+  pull_request:
+    branches:
+    - develop
+    types:
+    - opened
+    - reopened
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  #---------------------------------------------------------------------------------------------------------------------
+  # Build
+  #---------------------------------------------------------------------------------------------------------------------
+  build:
+    name: Build
+    uses: bayudwiyansatria/.github/.github/workflows/build-java-maven.yml@master
+    with:
+      JAVA_VERSION: 21
+      MAVEN_COMMAND: mvn --no-transfer-progress --file pom.xml --settings settings.xml clean package -DskipTests 
+    secrets:
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+  test:
+    name: Test
+    uses: bayudwiyansatria/.github/.github/workflows/build-java-maven.yml@master
+    with:
+      JAVA_VERSION: 21
+      MAVEN_COMMAND: mvn --no-transfer-progress --file pom.xml --settings settings.xml clean test verify
+      ARTIFACT_NAME: coverage
+      ARTIFACT_PATH: target/site/jacoco
+    secrets:
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # Code Quality
+  #---------------------------------------------------------------------------------------------------------------------
+  code-quality:
+    name: Code Quality
+    needs: 
+    - test
+    uses: bayudwiyansatria/.github/.github/workflows/code-analysis-codecov.yml@master
+    with:
+      ARTIFACT_NAME: coverage
+      ARTIFACT_PATH: target/site/jacoco
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

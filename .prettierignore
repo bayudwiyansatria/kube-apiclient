@@ -1,0 +1,6 @@
+# User-specific directory
+*.yaml
+*.yml
+
+# User-specific files
+.prettierignore

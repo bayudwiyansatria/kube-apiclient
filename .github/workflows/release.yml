@@ -1,0 +1,176 @@
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      MAJOR_VERSION:
+        type: number
+        description: Major Version
+        required: true
+        default: 0
+      MINOR_VERSION:
+        type: number
+        description: Minor Version
+        required: true
+        default: 0
+      INCREMENTAL_VERSION:
+        type: number
+        description: Patch Version
+        required: true
+        default: 1
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+  pages: write
+jobs:
+  #---------------------------------------------------------------------------------------------------------------------
+  # Build
+  #---------------------------------------------------------------------------------------------------------------------
+  build:
+    name: Build
+    uses: bayudwiyansatria/.github/.github/workflows/build-java-maven.yml@master
+    with:
+      JAVA_VERSION: 21
+      MAVEN_COMMAND: mvn --no-transfer-progress --file pom.xml --settings settings.xml clean package -DskipTests 
+    secrets:
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+  coverage:
+    name: Build Coverage
+    uses: bayudwiyansatria/.github/.github/workflows/build-java-maven.yml@master
+    with:
+      JAVA_VERSION: 21
+      MAVEN_COMMAND: mvn --no-transfer-progress --file pom.xml --settings settings.xml clean test verify
+      ARTIFACT_NAME: coverage
+      ARTIFACT_PATH: target/site/jacoco
+    secrets:
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+  docs:
+    name: Build Documentation
+    uses: bayudwiyansatria/.github/.github/workflows/build-java-maven.yml@master
+    with:
+      JAVA_VERSION: 21
+      MAVEN_COMMAND: mvn --no-transfer-progress --file pom.xml --settings settings.xml clean javadoc:javadoc
+      ARTIFACT_NAME: docs
+      ARTIFACT_PATH: target/site/apidocs
+    secrets:
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+  maven-version:
+    name: Set Maven Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.versions.outputs.version }}
+    steps:
+    - name: Get Maven Version
+      id: versions
+      uses: bayudwiyansatria/.github/actions/maven-get-version@master
+      with:
+        java-version: 21
+  #---------------------------------------------------------------------------------------------------------------------
+  # Code Quality
+  #---------------------------------------------------------------------------------------------------------------------
+  code-quality:
+    name: Code Quality
+    needs: 
+    - coverage
+    uses: bayudwiyansatria/.github/.github/workflows/code-analysis-codecov.yml@master
+    with:
+      ARTIFACT_NAME: coverage
+      ARTIFACT_PATH: target/site/jacoco
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # Deploy
+  #---------------------------------------------------------------------------------------------------------------------
+  docker:
+    name: Docker
+    needs: 
+    - build
+    - maven-version
+    uses: bayudwiyansatria/.github/.github/workflows/build-docker.yml@master
+    with:
+      DOCKER_REGISTRY: docker.io
+      DOCKER_FILE: docker/ci.Dockerfile
+      DOCKER_IMAGE_TAG: ${{ inputs.MAJOR_VERSION }}.${{ inputs.MINOR_VERSION }}.${{ inputs.INCREMENTAL_VERSION }}
+      DOCKER_BUILD_ARG: VERSION=${{ inputs.MAJOR_VERSION }}.${{ inputs.MINOR_VERSION }}.${{ inputs.INCREMENTAL_VERSION }}
+      PUSH_ENABLED: true
+      ARTIFACT_ENABLED: true
+      ARTIFACT_NAME: target
+      ARTIFACT_PATH: target
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  deploy:
+    name: Deploy
+    uses: bayudwiyansatria/.github/.github/workflows/deploy-maven.yml@master
+    needs: 
+    - build
+    with:
+      JAVA_VERSION: 21
+    secrets:
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # Publish
+  #---------------------------------------------------------------------------------------------------------------------
+  publish:
+    name: Deploy
+    uses: bayudwiyansatria/.github/.github/workflows/release-maven.yml@master
+    needs:
+    - build
+    with:
+      JAVA_VERSION: 21
+      MAJOR_VERSION: ${{ inputs.MAJOR_VERSION }}
+      MINOR_VERSION: ${{ inputs.MINOR_VERSION }}
+      INCREMENTAL_VERSION: ${{ inputs.INCREMENTAL_VERSION}}
+    secrets:
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # Release
+  #---------------------------------------------------------------------------------------------------------------------
+  release:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    name: Release
+    needs: 
+    - publish
+    uses: bayudwiyansatria/.github/.github/workflows/release-github.yml@master
+    with:
+      MAJOR_VERSION: ${{ inputs.MAJOR_VERSION }}
+      MINOR_VERSION: ${{ inputs.MINOR_VERSION }}
+      INCREMENTAL_VERSION: ${{ inputs.INCREMENTAL_VERSION }}
+      ARTIFACT_PACKAGES_TYPE: pom.xml
+      ARTIFACT_ASSET: target
+      ARTIFACT_NAME: target
+      ARTIFACT_PATH: target
+      COVERAGE_ENABLED: true
+      COVERAGE_NAME: coverage
+      COVERAGE_PATH: target/site/jacoco
+      DOCS_ENABLED: true
+      DOCS_NAME: docs
+      DOCS_PATH: target/site/apidocs
+    secrets:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+  #---------------------------------------------------------------------------------------------------------------------
+  # GitHub Pages
+  #---------------------------------------------------------------------------------------------------------------------
+  github-pages:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    name: GitHub Pages
+    needs: 
+    - build
+    - docs
+    - docker
+    - coverage
+    - release
+    uses: bayudwiyansatria/.github/.github/workflows/release-github-pages.yml@master
+    with:
+      ARTIFACT_NAME: docs
+      ARTIFACT_PATH: target/reports/apidocs
+      ARTIFACT_ROOT: target/reports/apidocs
+    secrets:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
