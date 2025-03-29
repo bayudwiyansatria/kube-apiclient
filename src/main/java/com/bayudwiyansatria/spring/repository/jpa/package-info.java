@@ -1,25 +1,23 @@
 /**
- * This package contains the JPA repository layer classes for the Spring Boot Boilerplate
- * application.
+ * This package contains the JPA repository classes for the Kubernetes Service application.
  *
  * <p>
- * The JPA repository layer is responsible for data access and persistence using Java Persistence
- * API (JPA). It provides an abstraction over the data storage mechanism, allowing the application
- * to interact with the database in a consistent and efficient manner.
- *
+ * The application is designed to provide a structured starting point for integrating Kubernetes
+ * API with Spring Boot applications. It includes pre-configured dependencies, build scripts, and
+ * best practices for managing Kubernetes resources such as secrets.
+ * </p>
  * <p>
  * Features include:
  * <ul>
- *   <li>Data access and persistence with JPA</li>
- *   <li>Integration with Spring Data JPA</li>
- *   <li>Custom JPA repository methods</li>
- *   <li>Repository layer unit tests</li>
+ *   <li>JPA repositories for managing persistent data storage</li>
+ *   <li>Integration with Spring Data JPA for seamless database operations</li>
+ *   <li>Custom repository interfaces for Kubernetes-related data</li>
  * </ul>
  *
  * @version 1.0
  * <p>
  * For more information, visit the project's
- * <a href="https://github.com/bayudwiyansatria/spring-boot-boilerplate">GitHub repository</a>.
+ * <a href="https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service">GitHub repository</a>.
  * <p>
  * Author: Bayu Dwiyan Satria
  * @since 1.0

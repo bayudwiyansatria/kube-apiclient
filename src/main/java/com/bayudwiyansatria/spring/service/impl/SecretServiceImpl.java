@@ -92,7 +92,7 @@ public class SecretServiceImpl implements SecretService {
         try {
             return new String(value, StandardCharsets.UTF_8);
         } catch (IllegalArgumentException e) {
-            System.err.println("Failed to decode value for key: " + key);
+            System.err.println("Failed to decode value for value");
             return null;
         }
     }

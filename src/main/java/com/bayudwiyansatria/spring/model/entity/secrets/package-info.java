@@ -1,5 +1,5 @@
 /**
- * This package contains the MongoDB repository classes for the Kubernetes Service application.
+ * This package contains the entity classes for managing Kubernetes secrets in the Kubernetes Service application.
  *
  * <p>
  * The application is designed to provide a structured starting point for integrating Kubernetes
@@ -9,9 +9,8 @@
  * <p>
  * Features include:
  * <ul>
- *   <li>MongoDB repositories for managing persistent data storage</li>
- *   <li>Integration with Spring Data MongoDB for seamless database operations</li>
- *   <li>Custom repository interfaces for Kubernetes-related data</li>
+ *   <li>SecretEntity: Represents a Kubernetes secret key-value pair.</li>
+ *   <li>SecretsEntity: Represents a collection of Kubernetes secrets, including their metadata and key-value pairs.</li>
  * </ul>
  *
  * @version 1.0
@@ -22,4 +21,4 @@
  * Author: Bayu Dwiyan Satria
  * @since 1.0
  */
-package com.bayudwiyansatria.spring.repository.mongodb;
+package com.bayudwiyansatria.spring.model.secret.entity;

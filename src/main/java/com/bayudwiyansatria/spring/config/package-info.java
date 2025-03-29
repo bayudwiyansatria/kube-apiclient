@@ -1,23 +1,22 @@
 /**
- * This package contains the configuration classes for the Spring Boot Boilerplate application.
+ * This package contains the configuration classes for the Kubernetes Service application.
  *
  * <p>
- * The configuration layer is responsible for defining and managing the application's configuration
- * settings. These classes are used to configure various aspects of the application, such as data
- * sources, security settings, and application properties.
+ * The application is designed to provide a structured starting point for integrating Kubernetes
+ * API with Spring Boot applications. It includes pre-configured dependencies, build scripts, and
+ * best practices for managing Kubernetes resources such as secrets.
+ * </p>
  * <p>
  * Features include:
  * <ul>
- *   <li>Application configuration settings</li>
- *   <li>Data source configuration</li>
- *   <li>Security configuration</li>
- *   <li>Configuration layer unit tests</li>
+ *   <li>KubernetesConfig: Configures the Kubernetes API client and CoreV1Api for interacting with Kubernetes resources.</li>
+ *   <li>MongoDBConfig: Configures MongoDB integration, including database connection settings and MongoTemplate setup.</li>
  * </ul>
  *
  * @version 1.0
  * <p>
  * For more information, visit the project's
- * <a href="https://github.com/bayudwiyansatria/spring-boot-boilerplate">GitHub repository</a>.
+ * <a href="https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service">GitHub repository</a>.
  * <p>
  * Author: Bayu Dwiyan Satria
  * @since 1.0

@@ -1,23 +1,25 @@
 /**
- * This package contains the service layer classes for the Spring Boot Boilerplate application.
+ * This package contains the service interfaces for the Kubernetes Service application.
+ *
  * <p>
- * The service layer is responsible for implementing the business logic of the application. It acts
- * as an intermediary between the controller layer and the data access layer, ensuring that the
- * application's business rules are enforced.
- * <p>
+ * The application is designed to provide a structured starting point for integrating Kubernetes
+ * API with Spring Boot applications. It includes pre-configured dependencies, build scripts, and
+ * best practices for managing Kubernetes resources such as secrets.
+ *
  * Features include:
  * <ul>
- *   <li>Business logic implementation</li>
- *   <li>Transaction management</li>
- *   <li>Integration with data access layer</li>
- *   <li>Service layer unit tests</li>
+ *   <li>Integration with Kubernetes API using the official Kubernetes Java client</li>
+ *   <li>Service interfaces for managing Kubernetes secrets and other resources</li>
+ *   <li>Comprehensive documentation and guidelines</li>
  * </ul>
  *
  * @version 1.0
+ *
  * <p>
  * For more information, visit the project's
- * <a href="https://github.com/bayudwiyansatria/spring-boot-boilerplate">GitHub repository</a>.
- * <p>
+ * <a href="https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service">GitHub repository</a>.
+ * </p>
+ *
  * Author: Bayu Dwiyan Satria
  * @since 1.0
  */

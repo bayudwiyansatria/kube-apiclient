@@ -1,26 +1,23 @@
 /**
- * This package contains the implementation classes for custom JPA repository methods in the Spring
- * Boot Boilerplate application.
+ * This package contains the implementation classes for custom JPA repositories in the Kubernetes Service application.
  *
  * <p>
- * The custom JPA repository implementation layer is responsible for providing concrete
- * implementations of custom data access and persistence logic using Java Persistence API (JPA). It
- * extends the capabilities of the standard JPA repository layer by implementing additional methods
- * and functionality tailored to the application's specific needs.
- *
+ * The application is designed to provide a structured starting point for integrating Kubernetes
+ * API with Spring Boot applications. It includes pre-configured dependencies, build scripts, and
+ * best practices for managing Kubernetes resources such as secrets.
+ * </p>
  * <p>
  * Features include:
  * <ul>
- *   <li>Custom data access and persistence with JPA</li>
- *   <li>Integration with Spring Data JPA</li>
- *   <li>Concrete implementations of custom JPA repository methods</li>
- *   <li>Repository layer unit tests</li>
+ *   <li>Custom implementations for advanced JPA repository queries</li>
+ *   <li>Integration with Spring Data JPA for seamless database operations</li>
+ *   <li>Support for Kubernetes-related data persistence and retrieval</li>
  * </ul>
  *
  * @version 1.0
  * <p>
  * For more information, visit the project's
- * <a href="https://github.com/bayudwiyansatria/spring-boot-boilerplate">GitHub repository</a>.
+ * <a href="https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service">GitHub repository</a>.
  * <p>
  * Author: Bayu Dwiyan Satria
  * @since 1.0

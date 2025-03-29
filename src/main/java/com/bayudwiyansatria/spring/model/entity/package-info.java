@@ -1,24 +1,22 @@
 /**
- * This package contains the entity classes for the Spring Boot Boilerplate application.
+ * This package contains the entity classes for the Kubernetes Service application.
  *
  * <p>
- * The entity layer is responsible for defining the data structures and entities that are mapped to
- * database tables. These classes represent the core business objects and are used throughout the
- * application for data persistence and retrieval.
- *
+ * The application is designed to provide a structured starting point for integrating Kubernetes
+ * API with Spring Boot applications. It includes pre-configured dependencies, build scripts, and
+ * best practices for managing Kubernetes resources such as secrets.
+ * </p>
  * <p>
  * Features include:
  * <ul>
- *   <li>Entity classes representing database tables</li>
- *   <li>Mapping annotations for ORM (Object-Relational Mapping)</li>
- *   <li>Validation annotations for ensuring data integrity</li>
- *   <li>Entity layer unit tests</li>
+ *   <li>SecretEntity: Represents a Kubernetes secret key-value pair.</li>
+ *   <li>SecretsEntity: Represents a collection of Kubernetes secrets, including their metadata and key-value pairs.</li>
  * </ul>
  *
  * @version 1.0
  * <p>
  * For more information, visit the project's
- * <a href="https://github.com/bayudwiyansatria/spring-boot-boilerplate">GitHub repository</a>.
+ * <a href="https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service">GitHub repository</a>.
  * <p>
  * Author: Bayu Dwiyan Satria
  * @since 1.0

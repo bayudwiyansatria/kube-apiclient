@@ -1,6 +1,6 @@
 services:
   spring:
-    image: bayudwiyansatria/spring-boot-boilerplate:latest
+    image: bayudwiyansatria/bayudwiyansatria-kubernetes-service:latest
     build:
       context: .
       # Bug: https://github.com/orgs/community/discussions/26634
