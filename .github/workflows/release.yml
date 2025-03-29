@@ -84,24 +84,24 @@ jobs:
   #---------------------------------------------------------------------------------------------------------------------
   # Deploy
   #---------------------------------------------------------------------------------------------------------------------
-  docker:
-    name: Docker
-    needs: 
-    - build
-    - maven-version
-    uses: bayudwiyansatria/.github/.github/workflows/build-docker.yml@master
-    with:
-      DOCKER_REGISTRY: docker.io
-      DOCKER_FILE: docker/ci.Dockerfile
-      DOCKER_IMAGE_TAG: ${{ inputs.MAJOR_VERSION }}.${{ inputs.MINOR_VERSION }}.${{ inputs.INCREMENTAL_VERSION }}
-      DOCKER_BUILD_ARG: VERSION=${{ inputs.MAJOR_VERSION }}.${{ inputs.MINOR_VERSION }}.${{ inputs.INCREMENTAL_VERSION }}
-      PUSH_ENABLED: true
-      ARTIFACT_ENABLED: true
-      ARTIFACT_NAME: target
-      ARTIFACT_PATH: target
-    secrets:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  # docker:
+  #   name: Docker
+  #   needs: 
+  #   - build
+  #   - maven-version
+  #   uses: bayudwiyansatria/.github/.github/workflows/build-docker.yml@master
+  #   with:
+  #     DOCKER_REGISTRY: docker.io
+  #     DOCKER_FILE: docker/ci.Dockerfile
+  #     DOCKER_IMAGE_TAG: ${{ inputs.MAJOR_VERSION }}.${{ inputs.MINOR_VERSION }}.${{ inputs.INCREMENTAL_VERSION }}
+  #     DOCKER_BUILD_ARG: VERSION=${{ inputs.MAJOR_VERSION }}.${{ inputs.MINOR_VERSION }}.${{ inputs.INCREMENTAL_VERSION }}
+  #     PUSH_ENABLED: true
+  #     ARTIFACT_ENABLED: true
+  #     ARTIFACT_NAME: target
+  #     ARTIFACT_PATH: target
+  #   secrets:
+  #     DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  #     DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
   deploy:
     name: Deploy
     uses: bayudwiyansatria/.github/.github/workflows/deploy-maven.yml@master
@@ -158,19 +158,19 @@ jobs:
   #---------------------------------------------------------------------------------------------------------------------
   # GitHub Pages
   #---------------------------------------------------------------------------------------------------------------------
-  github-pages:
-    if: ${{ github.event_name == 'workflow_dispatch' }}
-    name: GitHub Pages
-    needs: 
-    - build
-    - docs
-    - docker
-    - coverage
-    - release
-    uses: bayudwiyansatria/.github/.github/workflows/release-github-pages.yml@master
-    with:
-      ARTIFACT_NAME: docs
-      ARTIFACT_PATH: target/reports/apidocs
-      ARTIFACT_ROOT: target/reports/apidocs
-    secrets:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+  # github-pages:
+  #   if: ${{ github.event_name == 'workflow_dispatch' }}
+  #   name: GitHub Pages
+  #   needs: 
+  #   - build
+  #   - docs
+  #   - docker
+  #   - coverage
+  #   - release
+  #   uses: bayudwiyansatria/.github/.github/workflows/release-github-pages.yml@master
+  #   with:
+  #     ARTIFACT_NAME: docs
+  #     ARTIFACT_PATH: target/reports/apidocs
+  #     ARTIFACT_ROOT: target/reports/apidocs
+  #   secrets:
+  #     GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
