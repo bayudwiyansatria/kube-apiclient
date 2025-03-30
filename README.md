@@ -9,6 +9,8 @@
 
 A Spring Boot project for managing Kubernetes resources such as secrets. This repository provides a structured starting point for integrating Kubernetes API with Spring Boot applications.
 
+---
+
 ## Features
 
 - Integration with Kubernetes API using the official Kubernetes Java client
@@ -17,10 +19,14 @@ A Spring Boot project for managing Kubernetes resources such as secrets. This re
 - Example code for managing Kubernetes secrets
 - Comprehensive documentation and guidelines
 
+---
+
 ## Table of Contents
 
-- [Dependencies](#dependencies)
-- [Installation](#installation)
+- [Features](#features)
+- [Getting Started](#getting-started)
+  - [Dependencies](#dependencies)
+  - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
@@ -28,22 +34,91 @@ A Spring Boot project for managing Kubernetes resources such as secrets. This re
 - [Authors](#authors)
 - [Acknowledgments](#acknowledgments)
 
+---
+
 ## Getting Started
 
 ### Dependencies
 
 This project requires the following dependencies:
 
-- Java 11 or higher
-- Maven 3.6 or higher
-- Kubernetes cluster (local or remote)
+- **Java 11 or higher**: Ensure you have Java installed. You can download it from [AdoptOpenJDK](https://adoptopenjdk.net/).
+- **Maven 3.6 or higher**: Install Maven for building the project. You can download it from [Maven's official site](https://maven.apache.org/).
+- **Kubernetes cluster**: A local or remote Kubernetes cluster is required. You can use [Minikube](https://minikube.sigs.k8s.io/docs/) for local development.
+
+---
 
 ### Installation
 
 To set up the development environment, follow these steps:
 
-1. Clone the repository:
+1. **Clone the repository**:
 
    ```bash
    git clone https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service.git
+   cd bayudwiyansatria-kubernetes-service
    ```
+
+2. **Build the project**:
+
+   ```bash
+   mvn clean package
+   ```
+
+3. **Run the application**:
+
+   ```bash
+   java -jar target/bayudwiyansatria-kubernetes-service-0.1.0.jar
+   ```
+
+---
+
+## Usage
+
+1. **Configure Kubernetes Access**:
+
+   - Ensure your Kubernetes cluster is accessible via `kubectl`.
+   - Update the `application.yml` file with your Kubernetes configuration.
+
+2. **Run the Application**:
+
+   - Start the Spring Boot application using the command:
+     ```bash
+     java -jar target/bayudwiyansatria-kubernetes-service-0.1.0.jar
+     ```
+
+3. **Manage Kubernetes Secrets**:
+   - Use the provided REST API endpoints to manage Kubernetes secrets.
+
+---
+
+## Contributing
+
+Contributions are welcome! Please follow the [Contributing Guidelines](CONTRIBUTING.md) to submit issues or pull requests.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+## Versioning
+
+This project uses [Semantic Versioning](https://semver.org/). For the available versions, see the [tags on this repository](https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service/tags).
+
+---
+
+## Authors
+
+- **Bayu Dwiyan Satria** - _Initial work_ - [GitHub Profile](https://github.com/bayudwiyansatria)
+
+See also the list of [contributors](https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service/contributors) who participated in this project.
+
+---
+
+## Acknowledgments
+
+- Thanks to the Kubernetes and Spring Boot communities for their excellent documentation and tools.
+- Inspired by best practices in Kubernetes and Spring Boot development.
