@@ -1,0 +1,198 @@
+#-----------------------------------------------------------------------------------------------------------------------
+# ReplicaSet Configuration
+#-----------------------------------------------------------------------------------------------------------------------
+# This sets the number of replicas for the application.
+# More information: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Container Image Configuration
+#-----------------------------------------------------------------------------------------------------------------------
+# This sets the container image.
+# More information: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  repository: ghcr.io/bayudwiyansatria/bayudwiyansatria-kubernetes-service
+  # This sets the pull policy for images.
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Image Pull Secrets
+#-----------------------------------------------------------------------------------------------------------------------
+# Secrets for pulling an image from a private repository.
+# More information: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Chart Name Overrides
+#-----------------------------------------------------------------------------------------------------------------------
+# Override the chart name.
+nameOverride: ""
+fullnameOverride: ""
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Service Account Configuration
+#-----------------------------------------------------------------------------------------------------------------------
+# This section builds out the service account.
+# More information: https://kubernetes.io/docs/concepts/security/service-accounts/
+serviceAccount:
+  # Specifies whether a service account should be created.
+  create: true
+  # Automatically mount a ServiceAccount's API credentials.
+  automount: true
+  # Annotations to add to the service account.
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template.
+  name: ""
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Pod Annotations and Labels
+#-----------------------------------------------------------------------------------------------------------------------
+# Kubernetes annotations for the Pod.
+# More information: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+# Kubernetes labels for the Pod.
+# More information: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels: {}
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Pod Security Context
+#-----------------------------------------------------------------------------------------------------------------------
+# Security context for the Pod.
+# More information: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+podSecurityContext: {}
+  # fsGroup: 2000
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Container Security Context
+#-----------------------------------------------------------------------------------------------------------------------
+# Security context for the container.
+# More information: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Service Configuration
+#-----------------------------------------------------------------------------------------------------------------------
+# This is for setting up a service.
+# More information: https://kubernetes.io/docs/concepts/services-networking/service/
+service:
+  # This sets the service type.
+  # More information: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: ClusterIP
+  # This sets the ports.
+  # More information: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  port: 80
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Ingress Configuration
+#-----------------------------------------------------------------------------------------------------------------------
+# This block is for setting up the ingress.
+# More information: https://kubernetes.io/docs/concepts/services-networking/ingress/
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Resource Requests and Limits
+#-----------------------------------------------------------------------------------------------------------------------
+# Configure resource requests and limits for the application.
+# More information: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+resources: {}
+  # Uncomment and configure the following lines to set resource limits and requests.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Liveness and Readiness Probes
+#-----------------------------------------------------------------------------------------------------------------------
+# Configure liveness and readiness probes for the application.
+# More information: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Autoscaling Configuration
+#-----------------------------------------------------------------------------------------------------------------------
+# Configure horizontal pod autoscaling.
+# More information: https://kubernetes.io/docs/concepts/workloads/controllers/horizontal-pod-autoscaler/
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Additional Volumes and Mounts
+#-----------------------------------------------------------------------------------------------------------------------
+# Additional volumes for the Deployment.
+volumes: []
+# Example:
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+# Additional volume mounts for the Deployment.
+volumeMounts: []
+# Example:
+# - name: foo
+#   mountPath: "/etc/foo"
+#   readOnly: true
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Additional Environment Variables
+#-----------------------------------------------------------------------------------------------------------------------
+# Additional environment variables for the Deployment.
+envFrom: []
+# Example:
+# - secretRef:
+#     name: mysecret
+
+# Additional environment variables for the Deployment.
+env: []
+# Example:
+# - name: FOO
+#   value: BAR
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Node Selector, Tolerations, and Affinity
+#-----------------------------------------------------------------------------------------------------------------------
+# Node selector for scheduling pods on specific nodes.
+nodeSelector: {}
+
+# Tolerations for scheduling pods on tainted nodes.
+tolerations: []
+
+# Affinity rules for scheduling pods.
+affinity: {}

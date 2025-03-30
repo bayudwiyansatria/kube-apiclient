@@ -18,7 +18,7 @@ spring:
   cloud:
     kubernetes:
       client:
-        kubeconfig-file: ${KUBERNETES_CONFIG_FILE_PATH:-}
+        kubeconfig-file: ${KUBERNETES_CONFIG_FILE_PATH:/root/.kube/config}
   data:
     mongodb:
       host: ${MONGODB_HOST:localhost}
@@ -111,10 +111,6 @@ spring:
   config:
     activate:
       on-profile: development
-  data:
-    mongodb:
-      ssl:
-        enabled: false
 server:
   port: ${SERVER_PORT:8080}
 logging:

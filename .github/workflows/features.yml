@@ -1,5 +1,10 @@
 name: Features
 on:
+  push:
+    branches:
+    - feature/*
+    - hotfix/*
+    - bugfix/*
   pull_request:
     branches:
     - develop

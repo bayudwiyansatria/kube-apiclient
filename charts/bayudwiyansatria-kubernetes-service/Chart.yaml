@@ -1,0 +1,32 @@
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Chart
+#-----------------------------------------------------------------------------------------------------------------------
+apiVersion: v2
+name: bayudwiyansatria-kubernetes-service
+description: A Helm chart for deploying the bayudwiyansatria Kubernetes service application.
+type: application
+version: 0.1.0
+appVersion: 0.1.0
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Chart Dependencies
+#-----------------------------------------------------------------------------------------------------------------------
+dependencies: []
+
+#-----------------------------------------------------------------------------------------------------------------------
+# Chart Metadata
+#-----------------------------------------------------------------------------------------------------------------------
+keywords:
+- kubernetes
+- helm
+- service
+- application
+home: https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service
+sources:
+- https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service
+maintainers:
+- name: Bayu Dwiyan Satria
+  email: bayudwiyansatria@gmail.com
+  url: https://github.com/bayudwiyansatria
+icon: https://raw.githubusercontent.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service/main/icon.png
