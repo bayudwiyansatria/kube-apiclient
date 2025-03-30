@@ -27,7 +27,7 @@ public class Response<T> {
     /**
      * The status of the response.
      */
-    private boolean status;
+    private int status;
 
     /**
      * The additional data related to the response.
@@ -43,7 +43,7 @@ public class Response<T> {
      */
     public Response(
         String message,
-        boolean status,
+        int status,
         T data
     ) {
         this.message = message;
