@@ -1,8 +1,7 @@
 package com.bayudwiyansatria.spring.service;
 
 import com.bayudwiyansatria.spring.model.Response;
-import com.bayudwiyansatria.spring.repository.jpa.HomeJpaRepository;
-import com.bayudwiyansatria.spring.repository.mongodb.HomeMongoRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 /**
@@ -44,7 +43,7 @@ public class HomeService {
     public Response getHome() {
         return new Response(
             "Success",
-            true,
+            HttpStatus.OK.value(),
             null
         );
     }
