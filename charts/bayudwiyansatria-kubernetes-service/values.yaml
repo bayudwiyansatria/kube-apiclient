@@ -171,6 +171,21 @@ volumeMounts: []
 #   readOnly: true
 
 #-----------------------------------------------------------------------------------------------------------------------
+# Additional Environment Variables
+#-----------------------------------------------------------------------------------------------------------------------
+# Additional environment variables for the Deployment.
+envFrom: []
+# Example:
+# - secretRef:
+#     name: mysecret
+
+# Additional environment variables for the Deployment.
+env: []
+# Example:
+# - name: FOO
+#   value: BAR
+
+#-----------------------------------------------------------------------------------------------------------------------
 # Node Selector, Tolerations, and Affinity
 #-----------------------------------------------------------------------------------------------------------------------
 # Node selector for scheduling pods on specific nodes.

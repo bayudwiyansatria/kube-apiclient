@@ -9,6 +9,8 @@ target/
 
 # User-specific files
 .env
+values.yaml
+!charts/**/values.yaml
 *.suo
 *.user
 *.userosscache
