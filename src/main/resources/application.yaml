@@ -14,7 +14,7 @@ server:
 ---
 spring:
   application:
-    name: bayudwiyansatria-springboot-boilerplate
+    name: bayudwiyansatria-kubernetes-service
   cloud:
     kubernetes:
       client:
