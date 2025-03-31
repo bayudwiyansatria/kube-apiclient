@@ -11,7 +11,7 @@ replicaCount: 1
 # This sets the container image.
 # More information: https://kubernetes.io/docs/concepts/containers/images/
 image:
-  repository: ghcr.io/bayudwiyansatria/bayudwiyansatria-kubernetes-service
+  repository: ghcr.io/bayudwiyansatria/kube-api-client
   # This sets the pull policy for images.
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.

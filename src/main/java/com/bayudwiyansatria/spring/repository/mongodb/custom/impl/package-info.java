@@ -1,10 +1,11 @@
 /**
- * This package contains the implementation classes for custom MongoDB repositories in the Kubernetes Service application.
+ * This package contains the implementation classes for custom MongoDB repositories in the
+ * Kubernetes Service application.
  *
  * <p>
- * The application is designed to provide a structured starting point for integrating Kubernetes
- * API with Spring Boot applications. It includes pre-configured dependencies, build scripts, and
- * best practices for managing Kubernetes resources such as secrets.
+ * The application is designed to provide a structured starting point for integrating Kubernetes API
+ * with Spring Boot applications. It includes pre-configured dependencies, build scripts, and best
+ * practices for managing Kubernetes resources such as secrets.
  * </p>
  * <p>
  * Features include:
@@ -17,7 +18,7 @@
  * @version 1.0
  * <p>
  * For more information, visit the project's
- * <a href="https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service">GitHub repository</a>.
+ * <a href="https://github.com/bayudwiyansatria/kube-api-client">GitHub repository</a>.
  * <p>
  * Author: Bayu Dwiyan Satria
  * @since 1.0

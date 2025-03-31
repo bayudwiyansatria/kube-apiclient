@@ -2,8 +2,8 @@
  * Implementation classes for the service layer of the Kubernetes Service application.
  *
  * <p>
- * This package contains the concrete implementations of the service interfaces
- * defined in the {@code com.bayudwiyansatria.spring.service} package.
+ * This package contains the concrete implementations of the service interfaces defined in the
+ * {@code com.bayudwiyansatria.spring.service} package.
  * </p>
  *
  * <p>
@@ -13,7 +13,7 @@
  * @version 1.0
  * <p>
  * For more information, visit the project's
- * <a href="https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service">GitHub repository</a>.
+ * <a href="https://github.com/bayudwiyansatria/kube-api-client">GitHub repository</a>.
  * </p>
  * Author: Bayu Dwiyan Satria
  * @since 0.0.1

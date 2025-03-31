@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "bayudwiyansatria-kubernetes-service.fullname" . }}
+  name: {{ include "kube-api-client.fullname" . }}
   labels:
-    {{- include "bayudwiyansatria-kubernetes-service.labels" . | nindent 4 }}
+    {{- include "kube-api-client.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "bayudwiyansatria-kubernetes-service.fullname" . }}
+    name: {{ include "kube-api-client.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:

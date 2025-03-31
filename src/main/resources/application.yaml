@@ -14,7 +14,7 @@ server:
 ---
 spring:
   application:
-    name: bayudwiyansatria-kubernetes-service
+    name: kube-api-client
   cloud:
     kubernetes:
       client:

@@ -55,8 +55,8 @@ To set up the development environment, follow these steps:
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service.git
-   cd bayudwiyansatria-kubernetes-service
+   git clone https://github.com/bayudwiyansatria/kube-api-client.git
+   cd kube-api-client
    ```
 
 2. **Build the project**:
@@ -68,7 +68,7 @@ To set up the development environment, follow these steps:
 3. **Run the application**:
 
    ```bash
-   java -jar target/bayudwiyansatria-kubernetes-service-0.1.0.jar
+   java -jar target/kube-api-client-0.1.0.jar
    ```
 
 ---
@@ -84,7 +84,7 @@ To set up the development environment, follow these steps:
 
    - Start the Spring Boot application using the command:
      ```bash
-     java -jar target/bayudwiyansatria-kubernetes-service-0.1.0.jar
+     java -jar target/kube-api-client-0.1.0.jar
      ```
 
 3. **Manage Kubernetes Secrets**:
@@ -106,7 +106,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Versioning
 
-This project uses [Semantic Versioning](https://semver.org/). For the available versions, see the [tags on this repository](https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service/tags).
+This project uses [Semantic Versioning](https://semver.org/). For the available versions, see the [tags on this repository](https://github.com/bayudwiyansatria/kube-api-client/tags).
 
 ---
 
@@ -114,7 +114,7 @@ This project uses [Semantic Versioning](https://semver.org/). For the available 
 
 - **Bayu Dwiyan Satria** - _Initial work_ - [GitHub Profile](https://github.com/bayudwiyansatria)
 
-See also the list of [contributors](https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/bayudwiyansatria/kube-api-client/contributors) who participated in this project.
 
 ---
 

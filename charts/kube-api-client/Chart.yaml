@@ -3,7 +3,7 @@
 # Chart
 #-----------------------------------------------------------------------------------------------------------------------
 apiVersion: v2
-name: bayudwiyansatria-kubernetes-service
+name: kube-api-client
 description: A Helm chart for deploying the bayudwiyansatria Kubernetes service application.
 type: application
 version: 0.1.0
@@ -22,11 +22,11 @@ keywords:
 - helm
 - service
 - application
-home: https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service
+home: https://github.com/bayudwiyansatria/kube-api-client
 sources:
-- https://github.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service
+- https://github.com/bayudwiyansatria/kube-api-client
 maintainers:
 - name: Bayu Dwiyan Satria
   email: bayudwiyansatria@gmail.com
   url: https://github.com/bayudwiyansatria
-icon: https://raw.githubusercontent.com/bayudwiyansatria/bayudwiyansatria-kubernetes-service/main/icon.png
+icon: https://raw.githubusercontent.com/bayudwiyansatria/kube-api-client/main/icon.png
