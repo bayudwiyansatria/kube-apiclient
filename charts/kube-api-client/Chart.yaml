@@ -1,10 +1,9 @@
-
 #-----------------------------------------------------------------------------------------------------------------------
 # Chart
 #-----------------------------------------------------------------------------------------------------------------------
 apiVersion: v2
 name: kube-api-client
-description: A Helm chart for deploying the bayudwiyansatria Kubernetes service application.
+description: Spring Boot application for managing Kubernetes resources, featuring seamless integration with the Kubernetes API, pre-configured setups, and REST API endpoints for managing secrets.
 type: application
 version: 0.1.0
 appVersion: 0.1.0
@@ -12,7 +11,7 @@ appVersion: 0.1.0
 #-----------------------------------------------------------------------------------------------------------------------
 # Chart Dependencies
 #-----------------------------------------------------------------------------------------------------------------------
-dependencies: []
+dependencies: [ ]
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Chart Metadata
