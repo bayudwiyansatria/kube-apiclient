@@ -23,6 +23,7 @@ public interface SecretService {
     /**
      * Retrieves a list of all Kubernetes secrets.
      *
+     * @param parallelism a boolean indicating whether to use parallelism for the operation
      * @return a list of SecretsEntity representing the secrets
      */
     Response<List<SecretsEntity>> getSecrets(boolean parallelism);

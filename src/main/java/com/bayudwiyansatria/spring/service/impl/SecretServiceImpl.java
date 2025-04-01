@@ -33,7 +33,14 @@ public class SecretServiceImpl implements SecretService {
 
     private static final Logger logger = LoggerFactory.getLogger(SecretServiceImpl.class);
 
+    /**
+     * The Kubernetes CoreV1Api client used to interact with the Kubernetes API.
+     */
     protected final CoreV1Api coreClient;
+
+    /**
+     * The Kubernetes configuration used to initialize the API client.
+     */
     private final KubernetesConfig kubernetesConfig;
 
     /**
@@ -161,6 +168,7 @@ public class SecretServiceImpl implements SecretService {
      *
      * @param secretName the name of the secret
      * @param entryKey   the key of the secret entry
+     * @param entryValue the value of the secret entry
      * @return boolean indicating if the entry should be processed
      */
     protected boolean isValidSecretEntry(String secretName, String entryKey, String entryValue) {

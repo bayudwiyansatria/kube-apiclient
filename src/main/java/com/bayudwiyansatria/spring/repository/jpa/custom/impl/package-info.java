@@ -7,6 +7,7 @@
  * with Spring Boot applications. It includes pre-configured dependencies, build scripts, and best
  * practices for managing Kubernetes resources such as secrets.
  * </p>
+ *
  * <p>
  * Features include:
  * <ul>
@@ -18,8 +19,8 @@
  * @version 1.0
  * <p>
  * For more information, visit the project's
- * <a href="https://github.com/bayudwiyansatria/kube-apiclient>GitHub repository</a>.
- * <p>
+ * <a href="https://github.com/bayudwiyansatria/kube-apiclient">GitHub repository</a>.
+ * </p>
  * Author: Bayu Dwiyan Satria
  * @since 1.0
  */
