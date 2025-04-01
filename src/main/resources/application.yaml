@@ -86,6 +86,11 @@ management:
 # Application Config
 #-----------------------------------------------------------------------------------------------------------------------
 ---
+application:
+  http:
+    auth-token:
+      key: ${HTTP_AUTH_TOKEN_HEADER:X-API-KEY}
+      value: ${HTTP_AUTH_TOKEN_VALUE:-}
 logging:
   level:
     org:
