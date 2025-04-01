@@ -160,7 +160,12 @@ public class SecretServiceImpl implements SecretService {
      */
     protected boolean isValidSecret(V1Secret secret) {
         String name = Objects.requireNonNull(secret.getMetadata()).getName();
-        return name != null && !name.startsWith("sh.helm.release.v1");
+
+        if (name == null) {
+            return false;
+        }
+
+        return !name.startsWith("sh.helm.release.v1") && !name.startsWith("default-token");
     }
 
     /**
