@@ -25,5 +25,5 @@ public interface SecretService {
      *
      * @return a list of SecretsEntity representing the secrets
      */
-    Response<List<SecretsEntity>> getSecrets();
+    Response<List<SecretsEntity>> getSecrets(boolean parallelism);
 }
