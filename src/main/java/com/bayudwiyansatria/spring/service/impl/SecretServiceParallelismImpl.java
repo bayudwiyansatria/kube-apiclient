@@ -84,6 +84,7 @@ public class SecretServiceParallelismImpl extends SecretServiceImpl {
     @Override
     protected void processSecret(V1Secret secret, List<SecretsEntity> secretsEntity) {
         String name = Objects.requireNonNull(secret.getMetadata()).getName();
+        String namespace = Objects.requireNonNull(secret.getMetadata()).getNamespace();
 
         if (isValidSecret(secret)) {
             List<SecretEntity> secretData = Collections.synchronizedList(new ArrayList<>());
@@ -106,7 +107,7 @@ public class SecretServiceParallelismImpl extends SecretServiceImpl {
                 );
 
             synchronized (secretsEntity) {
-                secretsEntity.add(new SecretsEntity(name, secretData));
+                secretsEntity.add(new SecretsEntity(namespace + "-" + name, secretData));
             }
         }
     }
