@@ -14,7 +14,7 @@ server:
 ---
 spring:
   application:
-    name: kube-api-client
+    name: kube-apiclient
   cloud:
     kubernetes:
       client:

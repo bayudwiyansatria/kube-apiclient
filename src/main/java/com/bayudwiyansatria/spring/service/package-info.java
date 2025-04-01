@@ -17,7 +17,7 @@
  *
  * <p>
  * For more information, visit the project's
- * <a href="https://github.com/bayudwiyansatria/kube-api-client">GitHub repository</a>.
+ * <a href="https://github.com/bayudwiyansatria/kube-apiclient">GitHub repository</a>.
  * </p>
  * <p>
  * Author: Bayu Dwiyan Satria

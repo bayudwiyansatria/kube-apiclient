@@ -1,6 +1,6 @@
 services:
   spring:
-    image: ghcr.io/bayudwiyansatria/kube-api-client:latest
+    image: ghcr.io/bayudwiyansatria/kube-apiclient:latest
     build:
       context: .
       # Bug: https://github.com/orgs/community/discussions/26634

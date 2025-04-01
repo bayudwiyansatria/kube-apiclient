@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <!-- Parent -->
   <parent>
@@ -13,13 +12,13 @@
   <!-- Modules -->
   <!-- Packages -->
   <groupId>com.bayudwiyansatria.spring</groupId>
-  <artifactId>kube-api-client</artifactId>
+  <artifactId>kube-apiclient</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <!-- Artifact -->
   <name>Bayu Dwiyan Satria Kubernetes Service</name>
   <description>Bayu Dwiyan Satria Kubernetes Service</description>
-  <url>https://github.com/bayudwiyansatria/kube-api-client</url>
+  <url>https://github.com/bayudwiyansatria/kube-apiclient</url>
   <!-- Organization -->
   <organization>
     <name>Bayu Dwiyan Satria</name>
@@ -48,28 +47,28 @@
   </mailingLists>
   <!-- Source Management -->
   <scm>
-    <connection>scm:git:https://github.com/bayudwiyansatria/kube-api-client.git
+    <connection>scm:git:https://github.com/bayudwiyansatria/kube-apiclient.git
     </connection>
     <developerConnection>
-      scm:git:https://github.com/bayudwiyansatria/kube-api-client.git
+      scm:git:https://github.com/bayudwiyansatria/kube-apiclient.git
     </developerConnection>
-    <url>https://github.com/bayudwiyansatria/kube-api-client</url>
+    <url>https://github.com/bayudwiyansatria/kube-apiclient</url>
     <tag>HEAD</tag>
   </scm>
   <distributionManagement>
     <repository>
       <id>github</id>
       <name>Github Package Registry</name>
-      <url>https://maven.pkg.github.com/bayudwiyansatria/kube-api-client</url>
+      <url>https://maven.pkg.github.com/bayudwiyansatria/kube-apiclient</url>
     </repository>
   </distributionManagement>
   <issueManagement>
     <system>github</system>
-    <url>https://github.com/bayudwiyansatria/kube-api-client/issues</url>
+    <url>https://github.com/bayudwiyansatria/kube-apiclient/issues</url>
   </issueManagement>
   <ciManagement>
     <system>github</system>
-    <url>https:/github.com/bayudwiyansatria/kube-api-client/actions</url>
+    <url>https:/github.com/bayudwiyansatria/kube-apiclient/actions</url>
     <notifiers>
       <notifier>
         <type>mail</type>

@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "kube-api-client.fullname" . }}
+  name: {{ include "kube-apiclient.fullname" . }}
   labels:
-    {{- include "kube-api-client.labels" . | nindent 4 }}
+    {{- include "kube-apiclient.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "kube-api-client.fullname" . }}
+    name: {{ include "kube-apiclient.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:

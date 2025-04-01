@@ -2,7 +2,7 @@
 # Chart
 #-----------------------------------------------------------------------------------------------------------------------
 apiVersion: v2
-name: kube-api-client
+name: kube-apiclient
 description: Spring Boot application for managing Kubernetes resources, featuring seamless integration with the Kubernetes API, pre-configured setups, and REST API endpoints for managing secrets.
 type: application
 version: 0.1.0
@@ -21,11 +21,11 @@ keywords:
 - helm
 - service
 - application
-home: https://github.com/bayudwiyansatria/kube-api-client
+home: https://github.com/bayudwiyansatria/kube-apiclient
 sources:
-- https://github.com/bayudwiyansatria/kube-api-client
+- https://github.com/bayudwiyansatria/kube-apiclient
 maintainers:
 - name: Bayu Dwiyan Satria
   email: bayudwiyansatria@gmail.com
   url: https://github.com/bayudwiyansatria
-icon: https://raw.githubusercontent.com/bayudwiyansatria/kube-api-client/main/icon.png
+icon: https://raw.githubusercontent.com/bayudwiyansatria/kube-apiclient/main/icon.png
