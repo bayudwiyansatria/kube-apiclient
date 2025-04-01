@@ -40,6 +40,6 @@ public class SecretController {
     @GetMapping("")
     public ResponseEntity<Object> getSecrets() {
         return ResponseEntity
-            .ok(secretService.getSecrets());
+            .ok(secretService.getSecrets(true));
     }
 }
