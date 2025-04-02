@@ -1,12 +1,15 @@
 package com.bayudwiyansatria.spring.config;
 
+import com.bayudwiyansatria.spring.util.ServerApiKeyAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * SecurityConfig
@@ -22,6 +25,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Value("${application.http.auth-token.key}")
+    private String principalRequestHeader;
+
+    @Value("${application.http.auth-token.value}")
+    private String principalRequestValue;
+
     /**
      * Configures the security filter chain. Disables CSRF protection, allows public access to all
      * endpoints, enables HTTP basic authentication, and sets session management to stateless.
@@ -34,21 +43,34 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeHttpRequests(
-                authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
-                    // Allow public access to all endpoints
-                    .requestMatchers("/**")
-                    .permitAll()
-                    // Default behavior for all other requests
-                    .anyRequest()
-                    .authenticated()
+
+            // Security filter chain
+            .securityMatcher("/api/**")
+
+            // Add API Key filter before other filters
+            .addFilterBefore(
+                new ServerApiKeyAuthenticationFilter(
+                    principalRequestHeader,
+                    principalRequestValue
+                ),
+                UsernamePasswordAuthenticationFilter.class
             )
-            .httpBasic(Customizer.withDefaults())
+
+            // CSRF protection is disabled
+            .csrf(AbstractHttpConfigurer::disable)
+
+            // Set session management to stateless
             .sessionManagement(
-                httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer
-                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            );
+                session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         return http.build();
+    }
+
+    public String getPrincipalRequestHeader() {
+        return principalRequestHeader;
+    }
+
+    public String getPrincipalRequestValue() {
+        return principalRequestValue;
     }
 }

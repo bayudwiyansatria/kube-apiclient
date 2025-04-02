@@ -15,12 +15,12 @@ import lombok.Data;
  * @since 0.0.1
  */
 @Data
-public class Request {
+public class Request<T> {
 
     /**
      * The request payload.
      */
-    private Object request;
+    private T request;
 
     /**
      * Constructs a new Request with the specified request payload.
@@ -28,7 +28,7 @@ public class Request {
      * @param request the request payload
      * @since 0.0.1
      */
-    public Request(Object request) {
+    public Request(T request) {
         this.request = request;
     }
 }

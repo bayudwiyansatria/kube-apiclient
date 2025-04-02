@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 /**
  * Represents a collection of Kubernetes secrets.
  * <p>
- * This class contains the name of the secret and a list of key-value pairs
- * representing the individual secrets.
- * 
+ * This class contains the name of the secret and a list of key-value pairs representing the
+ * individual secrets.
+ *
  * @author Bayu Dwiyan Satria
  * @version 0.0.1
  * @since 0.0.1
@@ -20,6 +20,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SecretsEntity {
+
+    /**
+     * The namespace in which the Kubernetes secret is located.
+     */
+    private String namespace;
 
     /**
      * The name of the Kubernetes secret.

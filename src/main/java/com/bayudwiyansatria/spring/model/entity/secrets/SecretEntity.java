@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Represents a Kubernetes secret key-value pair.
- * 
+ *
  * @author Bayu Dwiyan Satria
  * @version 0.0.1
  * @since 0.0.1

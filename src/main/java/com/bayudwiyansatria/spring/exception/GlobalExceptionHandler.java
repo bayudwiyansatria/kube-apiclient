@@ -36,20 +36,38 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleNotFoundException(RuntimeException e) {
+        logger.error(e.getMessage(), e);
         return e.getMessage();
     }
 
     /**
      * Handles {@code MongoConfigurationException} and returns a 500 Internal Server Error status.
      *
-     * @param ex the MongoConfigurationException to handle
+     * @param e the MongoConfigurationException to handle
      * @return a ResponseEntity with the error message and HTTP status
      * @since 0.0.1
      */
     @ExceptionHandler(MongoConfigurationException.class)
-    public ResponseEntity<String> handleMongoConnectionException(MongoConfigurationException ex) {
-        // Return a custom error response with an appropriate message
-        return new ResponseEntity<>("MongoDB Connection Failed: " + ex.getMessage(),
-            HttpStatus.INTERNAL_SERVER_ERROR);
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<String> handleMongoConnectionException(MongoConfigurationException e) {
+        return new ResponseEntity<>(
+            "MongoDB Connection Failed: " + e.getMessage(),
+            HttpStatus.INTERNAL_SERVER_ERROR
+        );
+    }
+
+    /**
+     * Handles {@code KubernetesException} and returns a 500 Internal Server Error status.
+     *
+     * @param e the KubernetesException to handle
+     * @return a ResponseEntity with the error message and HTTP status
+     */
+    @ExceptionHandler(KubernetesConfigurationException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<String> handleKubernetesException(KubernetesConfigurationException e) {
+        return new ResponseEntity<>(
+            e.getMessage(),
+            HttpStatus.INTERNAL_SERVER_ERROR
+        );
     }
 }

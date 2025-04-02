@@ -48,8 +48,8 @@ public class KubernetesConfig {
     /**
      * Creates a CoreV1Api client using the configured ApiClient.
      * <p>
-     * The CoreV1Api is used to perform operations on Kubernetes core resources,
-     * such as secrets, pods, and config maps.
+     * The CoreV1Api is used to perform operations on Kubernetes core resources, such as secrets,
+     * pods, and config maps.
      *
      * @return a CoreV1Api instance
      */
