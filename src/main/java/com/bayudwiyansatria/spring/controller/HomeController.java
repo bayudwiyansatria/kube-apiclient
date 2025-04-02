@@ -1,6 +1,5 @@
 package com.bayudwiyansatria.spring.controller;
 
-import com.bayudwiyansatria.spring.model.Response;
 import com.bayudwiyansatria.spring.service.HomeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -49,7 +48,7 @@ public class HomeController {
      * @since 0.0.1
      */
     @GetMapping("")
-    public ResponseEntity<Response> getUserById(
+    public ResponseEntity<?> getUserById(
     ) {
         return ResponseEntity
             .ok()

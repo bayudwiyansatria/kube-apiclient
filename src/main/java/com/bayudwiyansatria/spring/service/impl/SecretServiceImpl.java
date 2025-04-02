@@ -1,16 +1,21 @@
 package com.bayudwiyansatria.spring.service.impl;
 
 import com.bayudwiyansatria.spring.config.KubernetesConfig;
+import com.bayudwiyansatria.spring.exception.KubernetesConfigurationException;
 import com.bayudwiyansatria.spring.model.Response;
 import com.bayudwiyansatria.spring.model.entity.SecretsEntity;
 import com.bayudwiyansatria.spring.model.entity.secrets.SecretEntity;
+import com.bayudwiyansatria.spring.service.KubernetesService;
 import com.bayudwiyansatria.spring.service.SecretService;
+import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Secret;
 import io.kubernetes.client.openapi.models.V1SecretList;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +38,44 @@ public class SecretServiceImpl implements SecretService {
 
     private static final Logger logger = LoggerFactory.getLogger(SecretServiceImpl.class);
 
+    private static final class LogMessages {
+
+        static final String CONNECTION_INIT_SUCCESS = "Connection initialized successfully";
+        static final String CONNECTION_INIT_FAILED = "Failed to initialize Connection";
+
+        static final String RETRIEVING_SECRET = "Retrieving secret: {} in namespace: {}";
+        static final String RETRIEVED_SECRET = "Retrieved secret successfully";
+        static final String FAILED_RETRIEVE = "Failed to retrieve secret";
+
+        static final String SECRET_ALREADY_EXISTS = "Secret already exists: {}";
+        static final String SECRET_ALREADY_EXISTS_NON_DYNAMICALLY = "Secret already exists";
+        static final String SECRET_NOT_FOUND = "Secret not found: {}";
+        static final String SECRET_NOT_FOUND_NON_DYNAMICALLY = "Secret not found";
+
+        static final String SECRET_CREATED = "Secret created: {}";
+        static final String SECRET_CREATED_NON_DYNAMICALLY = "Secret created";
+        static final String SECRET_CREATION_FAILED = "Secret creation failed";
+
+        static final String SECRET_UPDATED = "Secret updated: {}";
+        static final String SECRET_UPDATE_FAILED = "Secret update failed";
+
+        static final String SECRET_DELETED = "Secret deleted: {}";
+        static final String SECRET_DELETED_NON_DYNAMICALLY = "Secret deleted";
+        static final String SECRET_DELETION_FAILED = "Secret deletion failed";
+
+        static final String PROCESSING_SEQUENTIAL = "Retrieving secrets sequentially";
+        static final String DELEGATING_PARALLEL = "Delegating to parallel implementation";
+
+        static final String FAILED_DECODE = "Failed to decode secret value";
+    }
+
+    private static final class ResponseMessages {
+
+        static final String SUCCESS = "Success";
+        static final String FAILED = "Failed";
+        static final String NO_CONTENT = "No content";
+    }
+
     /**
      * The Kubernetes CoreV1Api client used to interact with the Kubernetes API.
      */
@@ -44,20 +87,27 @@ public class SecretServiceImpl implements SecretService {
     private final KubernetesConfig kubernetesConfig;
 
     /**
+     * The Kubernetes service used for additional operations.
+     */
+    private final KubernetesService kubernetesService;
+
+    /**
      * Constructor for {@link SecretServiceImpl}.
      *
      * @param kubernetesConfig the {@link KubernetesConfig} to initialize the API client
      * @throws RuntimeException if initialization of {@link CoreV1Api} fails
      */
     public SecretServiceImpl(
-        KubernetesConfig kubernetesConfig
+        KubernetesConfig kubernetesConfig,
+        KubernetesService kubernetesService
     ) {
         try {
-            this.kubernetesConfig = kubernetesConfig;
             this.coreClient = kubernetesConfig.coreV1Api();
-        } catch (Exception e) {
-            logger.error("Failed to initialize CoreV1Api", e);
-            throw new RuntimeException("Failed to initialize Kubernetes client", e);
+            this.kubernetesService = kubernetesService;
+            this.kubernetesConfig = kubernetesConfig;
+            logger.info(LogMessages.CONNECTION_INIT_SUCCESS);
+        } catch (KubernetesConfigurationException e) {
+            throw new KubernetesConfigurationException(LogMessages.CONNECTION_INIT_FAILED, e);
         }
     }
 
@@ -69,13 +119,182 @@ public class SecretServiceImpl implements SecretService {
      * @return a {@link Response} containing a {@link List} of {@link SecretsEntity}
      */
     @Override
-    public Response<List<SecretsEntity>> getSecrets(boolean parallelism) {
+    public Response<?> list(boolean parallelism) {
         if (parallelism) {
-            logger.info("Delegating to parallel implementation");
-            return new SecretServiceParallelismImpl(kubernetesConfig).getSecrets();
+            logger.info(LogMessages.DELEGATING_PARALLEL);
+            return new SecretServiceParallelismImpl(
+                kubernetesConfig,
+                this.kubernetesService
+            ).getSecrets();
         }
-        logger.info("Using sequential processing");
+        logger.info(LogMessages.PROCESSING_SEQUENTIAL);
         return this.getSecrets();
+    }
+
+    /**
+     * Retrieves a specific Kubernetes secret by its name and namespace.
+     *
+     * @param namespace the namespace of the secret
+     * @param name      the name of the secret
+     * @return a {@link Response} containing the {@link SecretsEntity}
+     */
+    @Override
+    public Response<?> get(
+        String namespace,
+        String name
+    ) {
+        try {
+            logger.info(LogMessages.RETRIEVING_SECRET, namespace, name);
+
+            // Retrieve the secret from the Kubernetes cluster
+            List<SecretEntity> data = new ArrayList<>();
+            V1Secret secret = this.coreClient.readNamespacedSecret(name, namespace).execute();
+
+            // Process the secret data
+            for (
+                Map.Entry<String, byte[]> entry : Objects.requireNonNull(secret.getData())
+                .entrySet()) {
+                String key = entry.getKey();
+                String value = getKubernetesSecret(entry.getValue());
+                if (isValidSecretEntry(name, key, value)) {
+                    data.add(new SecretEntity(key, value));
+                }
+            }
+
+            return new Response<>(
+                LogMessages.RETRIEVED_SECRET,
+                HttpStatus.OK.value(),
+                new SecretsEntity(
+                    namespace,
+                    name,
+                    data
+                )
+            );
+        } catch (ApiException e) {
+            logger.error(LogMessages.SECRET_NOT_FOUND, name, e);
+            return new Response<>(
+                LogMessages.SECRET_NOT_FOUND_NON_DYNAMICALLY,
+                HttpStatus.NOT_FOUND.value(),
+                null
+            );
+        }
+    }
+
+    /**
+     * Creates or updates a Kubernetes secret with the specified name, type, and data.
+     *
+     * @param namespace  the namespace of the secret
+     * @param name       the name of the secret
+     * @param type       the type of the secret
+     * @param secretData the data to be stored in the secret
+     * @return a {@link Response} indicating the result of the operation
+     */
+    @Override
+    public Response<?> create(
+        String namespace,
+        String name,
+        String type,
+        List<SecretEntity> secretData
+    ) {
+        // Check if secret exists
+        if (isSecretExist(namespace, name)) {
+            logger.info(LogMessages.SECRET_ALREADY_EXISTS, name);
+            return new Response<>(
+                LogMessages.SECRET_ALREADY_EXISTS_NON_DYNAMICALLY,
+                HttpStatus.CONFLICT.value(),
+                null
+            );
+        }
+
+        // Create a Secret object
+        V1Secret secret = new V1Secret();
+        secret.setApiVersion("v1");
+        secret.setMetadata(
+            this.kubernetesService.createMetaData(
+                namespace,
+                name,
+                new HashMap<>(),
+                new HashMap<>()
+            ));
+        secret.setKind("Secret");
+
+        // Set the type of the secret
+        Map<String, String> data = new HashMap<>();
+        for (SecretEntity secretEntity : secretData) {
+            data.put(secretEntity.getKey(), secretEntity.getValue());
+        }
+        secret.setStringData(data);
+
+        try {
+            // Create the secret in the Kubernetes cluster
+            this.coreClient.createNamespacedSecret(namespace, secret).execute();
+            logger.info(LogMessages.SECRET_CREATED);
+
+            return new Response<>(
+                LogMessages.SECRET_CREATED_NON_DYNAMICALLY,
+                HttpStatus.CREATED.value(),
+                new SecretsEntity(
+                    namespace,
+                    name,
+                    secretData
+                )
+            );
+        } catch (ApiException e) {
+            logger.error(LogMessages.SECRET_CREATION_FAILED, e);
+            return new Response<>(
+                LogMessages.SECRET_CREATION_FAILED,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                null
+            );
+        }
+    }
+
+    /**
+     * Updates an existing Kubernetes secret.
+     *
+     * @return a {@link Response} indicating the result of the operation
+     */
+    @Override
+    public Response<?> updateSecret() {
+        // TODO
+        return null;
+    }
+
+    /**
+     * Deletes a Kubernetes secret by its name and namespace.
+     *
+     * @param namespace the namespace of the secret
+     * @param name      the name of the secret
+     * @return a {@link Response} indicating the result of the operation
+     */
+    @Override
+    public Response<?> deleteSecret(String namespace, String name) {
+        try {
+            if (!isSecretExist(namespace, name)) {
+                logger.info(LogMessages.SECRET_NOT_FOUND, name);
+                return new Response<>(
+                    LogMessages.SECRET_NOT_FOUND_NON_DYNAMICALLY,
+                    HttpStatus.NOT_FOUND.value(),
+                    null
+                );
+            }
+
+            logger.info(LogMessages.SECRET_ALREADY_EXISTS, name);
+            // Delete the secret
+            this.coreClient.deleteNamespacedSecret(name, namespace).execute();
+
+            return new Response<>(
+                LogMessages.SECRET_DELETED_NON_DYNAMICALLY,
+                HttpStatus.OK.value(),
+                null
+            );
+        } catch (Exception e) {
+            return new Response<>(
+                LogMessages.SECRET_DELETION_FAILED,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                null
+            );
+        }
     }
 
     /**
@@ -83,7 +302,7 @@ public class SecretServiceImpl implements SecretService {
      *
      * @return a {@link Response} containing a {@link List} of {@link SecretsEntity}
      */
-    protected Response<List<SecretsEntity>> getSecrets() {
+    protected Response<?> getSecrets() {
         try {
             logger.info("Retrieving secrets sequentially");
             List<SecretsEntity> secretsEntity = new ArrayList<>();
@@ -99,9 +318,9 @@ public class SecretServiceImpl implements SecretService {
 
             return createResponse(secretsEntity);
         } catch (Exception e) {
-            logger.error("Failed to retrieve secrets", e);
+            logger.error(LogMessages.FAILED_DECODE, e);
             return new Response<>(
-                "Failed",
+                LogMessages.FAILED_DECODE,
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 null
             );
@@ -134,7 +353,7 @@ public class SecretServiceImpl implements SecretService {
                 }
             });
 
-            secretsEntity.add(new SecretsEntity(namespace + "-" + name, secretData));
+            secretsEntity.add(new SecretsEntity(namespace, name, secretData));
         }
     }
 
@@ -148,7 +367,7 @@ public class SecretServiceImpl implements SecretService {
         try {
             return new String(value, StandardCharsets.UTF_8);
         } catch (IllegalArgumentException e) {
-            logger.error("Failed to decode secret value", e);
+            logger.error(LogMessages.FAILED_DECODE, e);
             return null;
         }
     }
@@ -198,18 +417,35 @@ public class SecretServiceImpl implements SecretService {
      * @param secretsEntity the list of processed secrets
      * @return {@link Response} containing the results
      */
-    protected Response<List<SecretsEntity>> createResponse(List<SecretsEntity> secretsEntity) {
+    protected Response<List<SecretsEntity>> createResponse
+    (List<SecretsEntity> secretsEntity) {
         if (!secretsEntity.isEmpty()) {
             return new Response<>(
-                "Success",
+                LogMessages.RETRIEVING_SECRET,
                 HttpStatus.OK.value(),
                 secretsEntity
             );
         }
         return new Response<>(
-            "Success",
+            LogMessages.RETRIEVING_SECRET,
             HttpStatus.NO_CONTENT.value(),
             secretsEntity
         );
+    }
+
+    /**
+     * Checks if a secret exists in the specified namespace.
+     *
+     * @param namespace the namespace of the secret
+     * @param name      the name of the secret
+     * @return boolean indicating if the secret exists
+     */
+    private boolean isSecretExist(String namespace, String name) {
+        Response<?> existingSecret = this.get(namespace, name);
+        if (existingSecret != null && existingSecret.getStatus() == HttpStatus.OK.value()) {
+            logger.info(LogMessages.SECRET_ALREADY_EXISTS, name);
+            return true;
+        }
+        return false;
     }
 }

@@ -4,6 +4,7 @@ import com.bayudwiyansatria.spring.config.KubernetesConfig;
 import com.bayudwiyansatria.spring.model.Response;
 import com.bayudwiyansatria.spring.model.entity.SecretsEntity;
 import com.bayudwiyansatria.spring.model.entity.secrets.SecretEntity;
+import com.bayudwiyansatria.spring.service.KubernetesService;
 import com.bayudwiyansatria.spring.service.SecretService;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Secret;
@@ -39,8 +40,11 @@ public class SecretServiceParallelismImpl extends SecretServiceImpl {
      *
      * @param kubernetesConfig the {@link KubernetesConfig} to initialize the API client
      */
-    public SecretServiceParallelismImpl(KubernetesConfig kubernetesConfig) {
-        super(kubernetesConfig);
+    public SecretServiceParallelismImpl(
+        KubernetesConfig kubernetesConfig,
+        KubernetesService kubernetesService
+    ) {
+        super(kubernetesConfig, kubernetesService);
     }
 
     /**
@@ -107,7 +111,7 @@ public class SecretServiceParallelismImpl extends SecretServiceImpl {
                 );
 
             synchronized (secretsEntity) {
-                secretsEntity.add(new SecretsEntity(namespace + "-" + name, secretData));
+                secretsEntity.add(new SecretsEntity(namespace, name, secretData));
             }
         }
     }

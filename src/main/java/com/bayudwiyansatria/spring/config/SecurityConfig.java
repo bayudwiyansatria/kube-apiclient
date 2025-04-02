@@ -65,4 +65,12 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+    public String getPrincipalRequestHeader() {
+        return principalRequestHeader;
+    }
+
+    public String getPrincipalRequestValue() {
+        return principalRequestValue;
+    }
 }
