@@ -1,26 +1,25 @@
 /**
- * This package contains the service interfaces for the Kubernetes Service application.
+ * This package contains the service interfaces for the Kube API Client application.
  *
  * <p>
  * The application is designed to provide a structured starting point for integrating Kubernetes API
  * with Spring Boot applications. It includes pre-configured dependencies, build scripts, and best
  * practices for managing Kubernetes resources such as secrets.
- * <p>
- * Features include:
+ * </p>
+ *
+ * <h2>Key Features</h2>
  * <ul>
  *   <li>Integration with Kubernetes API using the official Kubernetes Java client</li>
  *   <li>Service interfaces for managing Kubernetes secrets and other resources</li>
  *   <li>Comprehensive documentation and guidelines</li>
  * </ul>
  *
- * @version 1.0
- *
  * <p>
- * For more information, visit the project's
+ * For detailed implementation examples and guidelines, refer to the
  * <a href="https://github.com/bayudwiyansatria/kube-apiclient">GitHub repository</a>.
  * </p>
- * <p>
- * Author: Bayu Dwiyan Satria
- * @since 1.0
+ *
+ * @author Bayu Dwiyan Satria
+ * @version 1.0.0
  */
 package com.bayudwiyansatria.spring.service;

@@ -1,23 +1,30 @@
 /**
- * This package contains the controller classes for the Kubernetes Service application.
+ * Controller package for the Kubernetes API Client application.
  *
  * <p>
- * The application is designed to provide a structured starting point for integrating Kubernetes API
- * with Spring Boot applications. It includes pre-configured dependencies, build scripts, and best
- * practices for managing Kubernetes resources such as secrets.
+ * This package contains the controller classes that define the API endpoints for managing
+ * Kubernetes resources in the application. The application is designed to integrate the Kubernetes
+ * API with Spring Boot and provides a structured starting point for working with Kubernetes,
+ * including management of resources such as secrets.
  * </p>
- * <p>
- * Features include:
+ *
+ * <h2>Key Components</h2>
  * <ul>
- *   <li>SecretController: Manages Kubernetes secrets, providing endpoints to retrieve and manage secrets.</li>
+ *   <li>{@code SecretController}: Manages Kubernetes secrets, offering endpoints for retrieving and managing secrets.</li>
  * </ul>
  *
- * @version 1.0
+ * <h2>Features</h2>
+ * <ul>
+ *   <li>Endpoint to retrieve Kubernetes secrets</li>
+ *   <li>Endpoint to manage Kubernetes secrets</li>
+ * </ul>
+ *
  * <p>
- * For more information, visit the project's
+ * For detailed implementation examples and guidelines, refer to the
  * <a href="https://github.com/bayudwiyansatria/kube-apiclient">GitHub repository</a>.
- * <p>
- * Author: Bayu Dwiyan Satria
- * @since 1.0
+ * </p>
+ *
+ * @author Bayu Dwiyan Satria
+ * @version 1.0.0
  */
 package com.bayudwiyansatria.spring.controller;

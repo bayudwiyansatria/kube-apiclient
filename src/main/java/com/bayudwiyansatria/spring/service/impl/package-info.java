@@ -1,5 +1,5 @@
 /**
- * Implementation classes for the service layer of the Kubernetes Service application.
+ * Implementation classes for the service layer of the Kube API Client application.
  *
  * <p>
  * This package contains the concrete implementations of the service interfaces defined in the
@@ -7,15 +7,16 @@
  * </p>
  *
  * <p>
- * These classes provide the actual logic for the operations defined in the service interfaces.
+ * These classes provide the actual logic for the operations defined in the service interfaces,
+ * ensuring seamless integration with the Kubernetes API.
  * </p>
  *
- * @version 1.0
  * <p>
- * For more information, visit the project's
+ * For detailed implementation examples and guidelines, refer to the project's
  * <a href="https://github.com/bayudwiyansatria/kube-apiclient">GitHub repository</a>.
  * </p>
- * Author: Bayu Dwiyan Satria
- * @since 0.0.1
+ *
+ * @author Bayu Dwiyan Satria
+ * @version 1.0.0
  */
 package com.bayudwiyansatria.spring.service.impl;

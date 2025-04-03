@@ -1,4 +1,4 @@
-# Kubernetes Service for Spring Boot
+# Kube API Client for Spring Boot
 
 ![Platforms](https://img.shields.io/badge/%20Platforms-Windows%20/%20Linux-blue.svg?style=flat-square)
 [![License](https://img.shields.io/badge/%20Licence-MIT-green.svg?style=flat-square)](LICENSE)

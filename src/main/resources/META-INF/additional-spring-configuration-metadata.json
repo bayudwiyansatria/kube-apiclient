@@ -1,14 +1,19 @@
 {
   "properties": [
     {
-      "name": "application.http.auth-token.key",
+      "name": "spring.application.api.auth-token.key",
       "type": "java.lang.String",
-      "description": "Description for application.http.auth-token.key."
+      "description": "Description for spring.application.api.auth-token.key."
     },
     {
-      "name": "application.http.auth-token.value",
+      "name": "spring.application.api.auth-token.value",
       "type": "java.lang.String",
-      "description": "Description for application.http.auth-token.value."
+      "description": "Description for spring.application.api.auth-token.value."
+    },
+    {
+      "name": "spring.cloud.kubernetes.client.kube-config-file",
+      "type": "java.lang.String",
+      "description": "Description for spring.cloud.kubernetes.client.kube-config-file."
     }
   ]
 }

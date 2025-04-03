@@ -13,8 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -23,22 +22,23 @@ import org.springframework.stereotype.Service;
  *
  * <p>
  * This class interacts with the Kubernetes API to retrieve and process secrets using
- * {@link CoreV1Api} client.
+ * {@link CoreV1Api} client. The secrets are processed in parallel for efficiency.
  * </p>
  *
  * @author Bayu Dwiyan Satria
  * @version 0.0.1
  * @since 0.0.1
  */
+@Slf4j
 @Service
 public class SecretServiceParallelismImpl extends SecretServiceImpl {
-
-    Logger logger = LoggerFactory.getLogger(SecretServiceParallelismImpl.class);
 
     /**
      * Constructor for {@link SecretServiceParallelismImpl}.
      *
-     * @param kubernetesConfig the {@link KubernetesConfig} to initialize the API client
+     * @param kubernetesConfig  the {@link KubernetesConfig} to initialize the API client
+     * @param kubernetesService the {@link KubernetesService} to manage interactions with
+     *                          Kubernetes
      */
     public SecretServiceParallelismImpl(
         KubernetesConfig kubernetesConfig,
@@ -48,15 +48,20 @@ public class SecretServiceParallelismImpl extends SecretServiceImpl {
     }
 
     /**
-     * Retrieves a list of all Kubernetes secrets.
+     * Retrieves a list of all Kubernetes secrets using parallel processing.
+     *
+     * <p>
+     * This method interacts with the Kubernetes API to fetch secrets from all namespaces. The
+     * secrets are then filtered and processed in parallel to improve performance.
+     * </p>
      *
      * @return a {@link Response} containing a {@link List} of {@link SecretsEntity} representing
-     * the secrets
+     * the retrieved secrets, or an error response if retrieval fails
      */
     @Override
     public Response<List<SecretsEntity>> getSecrets() {
         try {
-            logger.info("Retrieving secrets using parallel processing");
+            log.info("Retrieving secrets using parallel processing");
             List<SecretsEntity> secretsEntity = Collections.synchronizedList(new ArrayList<>());
 
             V1SecretList secrets = this.coreClient
@@ -70,7 +75,7 @@ public class SecretServiceParallelismImpl extends SecretServiceImpl {
 
             return this.createResponse(secretsEntity);
         } catch (Exception e) {
-            logger.error("Failed to retrieve secrets in parallel", e);
+            log.error("Failed to retrieve secrets in parallel", e);
             return new Response<>(
                 "Failed",
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
@@ -80,7 +85,12 @@ public class SecretServiceParallelismImpl extends SecretServiceImpl {
     }
 
     /**
-     * Processes an individual secret with parallel processing of secret data.
+     * Processes an individual Kubernetes secret with parallel processing of secret data.
+     *
+     * <p>
+     * This method processes the secret data (key-value pairs) in parallel, adding valid entries to
+     * a thread-safe collection.
+     * </p>
      *
      * @param secret        the {@link V1Secret} to process
      * @param secretsEntity the thread-safe list to add the processed secret to

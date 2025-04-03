@@ -1,5 +1,5 @@
 /**
- * This package contains the repository classes for the Kubernetes Service application.
+ * This package contains the repository classes for the Kube API Client application.
  *
  * <p>
  * The application is designed to provide a structured starting point for integrating Kubernetes API

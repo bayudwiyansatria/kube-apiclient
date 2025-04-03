@@ -1,25 +1,26 @@
 /**
- * This package contains the exception classes for the Kubernetes Service application.
+ * Exception package for the Kube API Client application.
  *
  * <p>
- * The application is designed to provide a structured starting point for integrating Kubernetes API
- * with Spring Boot applications. It includes pre-configured dependencies, build scripts, and best
- * practices for managing Kubernetes resources such as secrets.
+ * This package contains the exception classes that handle errors related to Kubernetes resources
+ * and integration with other services, such as MongoDB. The application is designed to integrate
+ * the Kubernetes API with Spring Boot, providing a robust and structured approach to error
+ * handling.
  * </p>
- * <p>
- * Features include:
+ *
+ * <h2>Key Features</h2>
  * <ul>
  *   <li>Custom exceptions for handling Kubernetes-related errors</li>
  *   <li>Exception classes for MongoDB integration issues</li>
  *   <li>Centralized error handling for better debugging and maintainability</li>
  * </ul>
  *
- * @version 1.0
  * <p>
- * For more information, visit the project's
+ * For detailed implementation examples and guidelines, refer to the
  * <a href="https://github.com/bayudwiyansatria/kube-apiclient">GitHub repository</a>.
- * <p>
- * Author: Bayu Dwiyan Satria
- * @since 1.0
+ * </p>
+ *
+ * @author Bayu Dwiyan Satria
+ * @version 1.0.0
  */
 package com.bayudwiyansatria.spring.exception;

@@ -7,6 +7,8 @@ server:
   port: ${SERVER_PORT:80}
   servlet:
     context-path: ${SERVER_CONTEXT_PATH:}
+  error:
+    include-stacktrace: never
 ---
 #-----------------------------------------------------------------------------------------------------------------------
 # Spring Config
@@ -14,11 +16,19 @@ server:
 ---
 spring:
   application:
-    name: kube-apiclient
+    name: @project.artifactId@
+    version: @project.version@
+    license:
+      name: MIT
+      url: https://opensource.org/licenses/MIT
+    api:
+      auth-token:
+        key: ${HTTP_AUTH_TOKEN_HEADER:X-API-KEY}
+        value: ${HTTP_AUTH_TOKEN_VALUE:-}
   cloud:
     kubernetes:
       client:
-        kubeconfig-file: ${KUBERNETES_CONFIG_FILE_PATH:/root/.kube/config}
+        kube-config-file: ${KUBERNETES_CONFIG_FILE_PATH:/root/.kube/config}
   data:
     mongodb:
       host: ${MONGODB_HOST:localhost}
@@ -60,10 +70,16 @@ spring:
 springdoc:
   api-docs:
     enabled: true
-  show-actuator: true
   swagger-ui:
     enabled: true
     path: ${SWAGGER_PATH:/swagger}
+  paths-to-exclude:
+    - /v3/api-docs
+    - /v3/api-docs/*
+    - /swagger-ui/**
+    - /swagger-ui
+    - /actuator/**
+  paths-to-match: /api/**
 ---
 #-----------------------------------------------------------------------------------------------------------------------
 # Management Config
@@ -86,11 +102,6 @@ management:
 # Application Config
 #-----------------------------------------------------------------------------------------------------------------------
 ---
-application:
-  http:
-    auth-token:
-      key: ${HTTP_AUTH_TOKEN_HEADER:X-API-KEY}
-      value: ${HTTP_AUTH_TOKEN_VALUE:-}
 logging:
   level:
     org:

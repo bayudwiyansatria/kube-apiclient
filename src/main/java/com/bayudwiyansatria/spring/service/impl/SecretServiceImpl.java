@@ -1,12 +1,15 @@
 package com.bayudwiyansatria.spring.service.impl;
 
 import com.bayudwiyansatria.spring.config.KubernetesConfig;
-import com.bayudwiyansatria.spring.exception.KubernetesConfigurationException;
+import com.bayudwiyansatria.spring.exception.config.KubernetesConfigurationException;
 import com.bayudwiyansatria.spring.model.Response;
 import com.bayudwiyansatria.spring.model.entity.SecretsEntity;
 import com.bayudwiyansatria.spring.model.entity.secrets.SecretEntity;
 import com.bayudwiyansatria.spring.service.KubernetesService;
 import com.bayudwiyansatria.spring.service.SecretService;
+import com.bayudwiyansatria.spring.util.logging.LogMessages;
+import com.bayudwiyansatria.spring.util.logging.LogMessages.Error;
+import com.bayudwiyansatria.spring.util.logging.LogMessages.Processing;
 import io.kubernetes.client.openapi.ApiException;
 import io.kubernetes.client.openapi.apis.CoreV1Api;
 import io.kubernetes.client.openapi.models.V1Secret;
@@ -17,126 +20,96 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 /**
- * Implementation of the SecretService interface for managing Kubernetes secrets.
- * <p>
- * This class interacts with the Kubernetes API to retrieve and process secrets.
+ * Implementation of the SecretService interface for managing Kubernetes secrets. This class
+ * provides functionality to create, read, update, and delete Kubernetes secrets across different
+ * namespaces.
+ *
+ * <p>This implementation includes support for both sequential and parallel processing of secrets,
+ * and handles various Kubernetes API responses and error conditions.</p>
  *
  * @author Bayu Dwiyan Satria
- * @version 0.0.1
- * @since 0.0.1
+ * @version 1.0.0
+ * @since 1.0.0
  */
+@Slf4j
 @Service
 @Primary
 public class SecretServiceImpl implements SecretService {
 
-    private static final Logger logger = LoggerFactory.getLogger(SecretServiceImpl.class);
-
-    private static final class LogMessages {
-
-        static final String CONNECTION_INIT_SUCCESS = "Connection initialized successfully";
-        static final String CONNECTION_INIT_FAILED = "Failed to initialize Connection";
-
-        static final String RETRIEVING_SECRET = "Retrieving secret: {} in namespace: {}";
-        static final String RETRIEVED_SECRET = "Retrieved secret successfully";
-        static final String FAILED_RETRIEVE = "Failed to retrieve secret";
-
-        static final String SECRET_ALREADY_EXISTS = "Secret already exists: {}";
-        static final String SECRET_ALREADY_EXISTS_NON_DYNAMICALLY = "Secret already exists";
-        static final String SECRET_NOT_FOUND = "Secret not found: {}";
-        static final String SECRET_NOT_FOUND_NON_DYNAMICALLY = "Secret not found";
-
-        static final String SECRET_CREATED = "Secret created: {}";
-        static final String SECRET_CREATED_NON_DYNAMICALLY = "Secret created";
-        static final String SECRET_CREATION_FAILED = "Secret creation failed";
-
-        static final String SECRET_UPDATED = "Secret updated: {}";
-        static final String SECRET_UPDATE_FAILED = "Secret update failed";
-
-        static final String SECRET_DELETED = "Secret deleted: {}";
-        static final String SECRET_DELETED_NON_DYNAMICALLY = "Secret deleted";
-        static final String SECRET_DELETION_FAILED = "Secret deletion failed";
-
-        static final String PROCESSING_SEQUENTIAL = "Retrieving secrets sequentially";
-        static final String DELEGATING_PARALLEL = "Delegating to parallel implementation";
-
-        static final String FAILED_DECODE = "Failed to decode secret value";
-    }
-
-    private static final class ResponseMessages {
-
-        static final String SUCCESS = "Success";
-        static final String FAILED = "Failed";
-        static final String NO_CONTENT = "No content";
-    }
-
     /**
-     * The Kubernetes CoreV1Api client used to interact with the Kubernetes API.
+     * Core Kubernetes API client for secret operations.
      */
     protected final CoreV1Api coreClient;
 
     /**
-     * The Kubernetes configuration used to initialize the API client.
+     * Kubernetes configuration for API client initialization.
      */
     private final KubernetesConfig kubernetesConfig;
 
     /**
-     * The Kubernetes service used for additional operations.
+     * Kubernetes service for additional operations.
      */
     private final KubernetesService kubernetesService;
 
     /**
-     * Constructor for {@link SecretServiceImpl}.
+     * Constructs a new SecretServiceImpl with required dependencies.
      *
-     * @param kubernetesConfig the {@link KubernetesConfig} to initialize the API client
-     * @throws RuntimeException if initialization of {@link CoreV1Api} fails
+     * @param kubernetesConfig  the configuration for Kubernetes API client
+     * @param kubernetesService the service for additional Kubernetes operations
+     * @since 1.0.0
      */
     public SecretServiceImpl(
         KubernetesConfig kubernetesConfig,
         KubernetesService kubernetesService
     ) {
-        try {
-            this.coreClient = kubernetesConfig.coreV1Api();
-            this.kubernetesService = kubernetesService;
-            this.kubernetesConfig = kubernetesConfig;
-            logger.info(LogMessages.CONNECTION_INIT_SUCCESS);
-        } catch (KubernetesConfigurationException e) {
-            throw new KubernetesConfigurationException(LogMessages.CONNECTION_INIT_FAILED, e);
-        }
+        this.coreClient = kubernetesConfig.coreV1Api();
+        this.kubernetesService = kubernetesService;
+        this.kubernetesConfig = kubernetesConfig;
     }
 
     /**
-     * Retrieves secrets with optional parallelism support. Delegates to
-     * {@link SecretServiceParallelismImpl} when parallelism is enabled.
+     * Lists all secrets across all namespaces with optional parallel processing.
      *
-     * @param parallelism whether to use parallel processing
-     * @return a {@link Response} containing a {@link List} of {@link SecretsEntity}
+     * @param parallelism whether to process secrets in parallel
+     * @return a {@link Response} containing:
+     * <ul>
+     *     <li>HTTP 200 (OK) with list of secrets if found</li>
+     *     <li>HTTP 204 (NO_CONTENT) if no secrets exist</li>
+     * </ul>
+     * @throws KubernetesConfigurationException if there's an error retrieving secrets
+     * @since 1.0.0
      */
     @Override
     public Response<?> list(boolean parallelism) {
         if (parallelism) {
-            logger.info(LogMessages.DELEGATING_PARALLEL);
+            log.info(Processing.PARALLEL);
             return new SecretServiceParallelismImpl(
                 kubernetesConfig,
                 this.kubernetesService
             ).getSecrets();
         }
-        logger.info(LogMessages.PROCESSING_SEQUENTIAL);
+        log.info(Processing.SEQUENTIAL);
         return this.getSecrets();
     }
 
     /**
-     * Retrieves a specific Kubernetes secret by its name and namespace.
+     * Retrieves a specific secret by name from a namespace.
      *
-     * @param namespace the namespace of the secret
-     * @param name      the name of the secret
-     * @return a {@link Response} containing the {@link SecretsEntity}
+     * @param namespace the namespace containing the secret
+     * @param name      the name of the secret to retrieve
+     * @return a {@link Response} containing:
+     * <ul>
+     *     <li>HTTP 200 (OK) with the secret details if found</li>
+     *     <li>HTTP 404 (NOT_FOUND) if the secret doesn't exist</li>
+     * </ul>
+     * @throws KubernetesConfigurationException if there's an error retrieving the secret
+     * @since 1.0.0
      */
     @Override
     public Response<?> get(
@@ -144,7 +117,7 @@ public class SecretServiceImpl implements SecretService {
         String name
     ) {
         try {
-            logger.info(LogMessages.RETRIEVING_SECRET, namespace, name);
+            log.info(LogMessages.Service.Secret.Retrieve.PROCESS, name, namespace);
 
             // Retrieve the secret from the Kubernetes cluster
             List<SecretEntity> data = new ArrayList<>();
@@ -162,7 +135,7 @@ public class SecretServiceImpl implements SecretService {
             }
 
             return new Response<>(
-                LogMessages.RETRIEVED_SECRET,
+                LogMessages.Service.Secret.Retrieve.SUCCESS,
                 HttpStatus.OK.value(),
                 new SecretsEntity(
                     namespace,
@@ -171,23 +144,24 @@ public class SecretServiceImpl implements SecretService {
                 )
             );
         } catch (ApiException e) {
-            logger.error(LogMessages.SECRET_NOT_FOUND, name, e);
-            return new Response<>(
-                LogMessages.SECRET_NOT_FOUND_NON_DYNAMICALLY,
-                HttpStatus.NOT_FOUND.value(),
-                null
-            );
+            throw new KubernetesConfigurationException(e.getMessage());
         }
     }
 
     /**
-     * Creates or updates a Kubernetes secret with the specified name, type, and data.
+     * Creates a new Kubernetes secret.
      *
-     * @param namespace  the namespace of the secret
-     * @param name       the name of the secret
-     * @param type       the type of the secret
-     * @param secretData the data to be stored in the secret
-     * @return a {@link Response} indicating the result of the operation
+     * @param namespace  the namespace where the secret should be created
+     * @param name       the name of the secret to create
+     * @param type       the type of the secret (e.g., "Opaque", "kubernetes.io/tls")
+     * @param secretData the list of key-value pairs to store in the secret
+     * @return a {@link Response} containing:
+     * <ul>
+     *     <li>HTTP 201 (CREATED) with the created secret details on success</li>
+     *     <li>HTTP 409 (CONFLICT) if the secret already exists</li>
+     * </ul>
+     * @throws KubernetesConfigurationException if there's an error creating the secret
+     * @since 1.0.0
      */
     @Override
     public Response<?> create(
@@ -196,14 +170,22 @@ public class SecretServiceImpl implements SecretService {
         String type,
         List<SecretEntity> secretData
     ) {
-        // Check if secret exists
-        if (isSecretExist(namespace, name)) {
-            logger.info(LogMessages.SECRET_ALREADY_EXISTS, name);
-            return new Response<>(
-                LogMessages.SECRET_ALREADY_EXISTS_NON_DYNAMICALLY,
-                HttpStatus.CONFLICT.value(),
-                null
-            );
+        try {
+            // Check if secret exists using get method
+            Response<?> existingSecret = this.get(namespace, name);
+
+            // If get() returns 200, the secret exists
+            if (existingSecret.getStatus() == HttpStatus.OK.value()) {
+                return new Response<>(
+                    LogMessages.Service.Secret.Exists.SIMPLE,
+                    HttpStatus.CONFLICT.value(),
+                    null
+                );
+            }
+        } catch (KubernetesConfigurationException e) {
+            if (!e.getMessage().contains("\"code\":404")) {
+                throw e;
+            }
         }
 
         // Create a Secret object
@@ -228,10 +210,10 @@ public class SecretServiceImpl implements SecretService {
         try {
             // Create the secret in the Kubernetes cluster
             this.coreClient.createNamespacedSecret(namespace, secret).execute();
-            logger.info(LogMessages.SECRET_CREATED);
+            log.info(LogMessages.Service.Secret.Create.DYNAMIC, name);
 
             return new Response<>(
-                LogMessages.SECRET_CREATED_NON_DYNAMICALLY,
+                LogMessages.Service.Secret.Create.SIMPLE,
                 HttpStatus.CREATED.value(),
                 new SecretsEntity(
                     namespace,
@@ -240,9 +222,9 @@ public class SecretServiceImpl implements SecretService {
                 )
             );
         } catch (ApiException e) {
-            logger.error(LogMessages.SECRET_CREATION_FAILED, e);
+            log.error(LogMessages.Service.Secret.Create.FAILED, e);
             return new Response<>(
-                LogMessages.SECRET_CREATION_FAILED,
+                LogMessages.Service.Secret.Create.FAILED,
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 null
             );
@@ -252,7 +234,9 @@ public class SecretServiceImpl implements SecretService {
     /**
      * Updates an existing Kubernetes secret.
      *
-     * @return a {@link Response} indicating the result of the operation
+     * @return a {@link Response} indicating the result of the update operation
+     * @throws KubernetesConfigurationException if there's an error updating the secret
+     * @since 1.0.0
      */
     @Override
     public Response<?> updateSecret() {
@@ -261,36 +245,42 @@ public class SecretServiceImpl implements SecretService {
     }
 
     /**
-     * Deletes a Kubernetes secret by its name and namespace.
+     * Deletes a Kubernetes secret.
      *
-     * @param namespace the namespace of the secret
-     * @param name      the name of the secret
-     * @return a {@link Response} indicating the result of the operation
+     * @param namespace the namespace containing the secret
+     * @param name      the name of the secret to delete
+     * @return a {@link Response} containing:
+     * <ul>
+     *     <li>HTTP 200 (OK) if the secret was successfully deleted</li>
+     *     <li>HTTP 404 (NOT_FOUND) if the secret doesn't exist</li>
+     * </ul>
+     * @throws KubernetesConfigurationException if there's an error deleting the secret
+     * @since 1.0.0
      */
     @Override
     public Response<?> deleteSecret(String namespace, String name) {
         try {
             if (!isSecretExist(namespace, name)) {
-                logger.info(LogMessages.SECRET_NOT_FOUND, name);
+                log.info(LogMessages.Service.Secret.NotFound.DYNAMIC, name);
                 return new Response<>(
-                    LogMessages.SECRET_NOT_FOUND_NON_DYNAMICALLY,
+                    LogMessages.Service.Secret.NotFound.SIMPLE,
                     HttpStatus.NOT_FOUND.value(),
                     null
                 );
             }
 
-            logger.info(LogMessages.SECRET_ALREADY_EXISTS, name);
+            log.info(LogMessages.Service.Secret.Exists.DYNAMIC, name);
             // Delete the secret
             this.coreClient.deleteNamespacedSecret(name, namespace).execute();
 
             return new Response<>(
-                LogMessages.SECRET_DELETED_NON_DYNAMICALLY,
+                LogMessages.Service.Secret.Exists.SIMPLE,
                 HttpStatus.OK.value(),
                 null
             );
         } catch (Exception e) {
             return new Response<>(
-                LogMessages.SECRET_DELETION_FAILED,
+                LogMessages.Service.Secret.Delete.FAILED,
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 null
             );
@@ -298,13 +288,14 @@ public class SecretServiceImpl implements SecretService {
     }
 
     /**
-     * Retrieves a list of all Kubernetes secrets using sequential processing.
+     * Retrieves secrets using sequential processing.
      *
-     * @return a {@link Response} containing a {@link List} of {@link SecretsEntity}
+     * @return a {@link Response} containing the list of secrets
+     * @throws KubernetesConfigurationException if there's an error retrieving secrets
      */
     protected Response<?> getSecrets() {
         try {
-            logger.info("Retrieving secrets sequentially");
+            log.info("Retrieving secrets sequentially");
             List<SecretsEntity> secretsEntity = new ArrayList<>();
 
             V1SecretList secrets = this.coreClient
@@ -318,9 +309,9 @@ public class SecretServiceImpl implements SecretService {
 
             return createResponse(secretsEntity);
         } catch (Exception e) {
-            logger.error(LogMessages.FAILED_DECODE, e);
+            log.error(Error.DECODE_FAILED, e);
             return new Response<>(
-                LogMessages.FAILED_DECODE,
+                Error.DECODE_FAILED,
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 null
             );
@@ -328,10 +319,10 @@ public class SecretServiceImpl implements SecretService {
     }
 
     /**
-     * Processes an individual secret and adds it to the secrets entity list.
+     * Processes an individual secret and adds it to the secrets collection.
      *
-     * @param secret        the {@link V1Secret} to process
-     * @param secretsEntity the list to add the processed secret to
+     * @param secret        the Kubernetes secret to process
+     * @param secretsEntity the collection to add the processed secret to
      */
     protected void processSecret(V1Secret secret, List<SecretsEntity> secretsEntity) {
         String name = Objects.requireNonNull(secret.getMetadata()).getName();
@@ -358,25 +349,25 @@ public class SecretServiceImpl implements SecretService {
     }
 
     /**
-     * Decodes a Kubernetes secret value from a byte array to a UTF-8 string.
+     * Decodes a Kubernetes secret value from bytes to string.
      *
-     * @param value the byte array value of the secret
-     * @return the decoded string value of the secret, or {@code null} if decoding fails
+     * @param value the byte array containing the secret value
+     * @return the decoded string value, or null if decoding fails
      */
     protected String getKubernetesSecret(byte[] value) {
         try {
             return new String(value, StandardCharsets.UTF_8);
         } catch (IllegalArgumentException e) {
-            logger.error(LogMessages.FAILED_DECODE, e);
+            log.error(Error.DECODE_FAILED, e);
             return null;
         }
     }
 
     /**
-     * Validates if the secret should be processed based on naming conventions.
+     * Validates if a secret should be processed based on naming conventions.
      *
-     * @param secret the {@link V1Secret} to validate
-     * @return boolean indicating if the secret should be processed
+     * @param secret the Kubernetes secret to validate
+     * @return true if the secret should be processed, false otherwise
      */
     protected boolean isValidSecret(V1Secret secret) {
         String name = Objects.requireNonNull(secret.getMetadata()).getName();
@@ -389,12 +380,12 @@ public class SecretServiceImpl implements SecretService {
     }
 
     /**
-     * Validates if a secret entry should be processed.
+     * Validates if a secret entry should be included in the response.
      *
      * @param secretName the name of the secret
      * @param entryKey   the key of the secret entry
      * @param entryValue the value of the secret entry
-     * @return boolean indicating if the entry should be processed
+     * @return true if the entry should be included, false otherwise
      */
     protected boolean isValidSecretEntry(String secretName, String entryKey, String entryValue) {
         if (entryValue.isEmpty()) {
@@ -412,22 +403,22 @@ public class SecretServiceImpl implements SecretService {
     }
 
     /**
-     * Creates an appropriate response based on the secrets entity list.
+     * Creates a response based on the processed secrets.
      *
      * @param secretsEntity the list of processed secrets
-     * @return {@link Response} containing the results
+     * @return a {@link Response} with appropriate status and data
      */
     protected Response<List<SecretsEntity>> createResponse
     (List<SecretsEntity> secretsEntity) {
         if (!secretsEntity.isEmpty()) {
             return new Response<>(
-                LogMessages.RETRIEVING_SECRET,
+                LogMessages.Service.Secret.Retrieve.SUCCESS,
                 HttpStatus.OK.value(),
                 secretsEntity
             );
         }
         return new Response<>(
-            LogMessages.RETRIEVING_SECRET,
+            LogMessages.Service.Secret.Retrieve.SUCCESS,
             HttpStatus.NO_CONTENT.value(),
             secretsEntity
         );
@@ -443,7 +434,7 @@ public class SecretServiceImpl implements SecretService {
     private boolean isSecretExist(String namespace, String name) {
         Response<?> existingSecret = this.get(namespace, name);
         if (existingSecret != null && existingSecret.getStatus() == HttpStatus.OK.value()) {
-            logger.info(LogMessages.SECRET_ALREADY_EXISTS, name);
+            log.info(LogMessages.Service.Secret.Exists.DYNAMIC, name);
             return true;
         }
         return false;

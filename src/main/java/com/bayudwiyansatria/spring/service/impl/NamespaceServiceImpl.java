@@ -1,7 +1,7 @@
 package com.bayudwiyansatria.spring.service.impl;
 
 import com.bayudwiyansatria.spring.config.KubernetesConfig;
-import com.bayudwiyansatria.spring.exception.KubernetesConfigurationException;
+import com.bayudwiyansatria.spring.exception.config.KubernetesConfigurationException;
 import com.bayudwiyansatria.spring.model.Response;
 import com.bayudwiyansatria.spring.service.KubernetesService;
 import com.bayudwiyansatria.spring.service.NamespaceService;
@@ -12,15 +12,27 @@ import io.kubernetes.client.openapi.models.V1NamespaceList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+/**
+ * NamespaceServiceImpl
+ * <p>
+ * This class provides the implementation of the NamespaceService interface. It is responsible for
+ * interacting with the Kubernetes API to manage namespaces within the Kubernetes cluster.
+ * </p>
+ *
+ * <p>The class is annotated with {@code @Service}, indicating that it is a service component in
+ * the Spring application context.</p>
+ *
+ * @author Bayu Dwiyan Satria
+ * @version 0.0.1
+ * @since 0.0.1
+ */
+@Slf4j
 @Service
 public class NamespaceServiceImpl implements NamespaceService {
-
-    private static final Logger logger = LoggerFactory.getLogger(NamespaceServiceImpl.class);
 
     /**
      * The Kubernetes CoreV1Api client used to interact with the Kubernetes API.
@@ -37,6 +49,16 @@ public class NamespaceServiceImpl implements NamespaceService {
      */
     private final KubernetesService kubernetesService;
 
+    /**
+     * Constructs a new NamespaceServiceImpl with the specified Kubernetes configuration, CoreV1Api
+     * client, and KubernetesService.
+     *
+     * @param coreClient        the CoreV1Api client for interacting with the Kubernetes API
+     * @param kubernetesConfig  the Kubernetes configuration for setting up the API client
+     * @param kubernetesService the KubernetesService used for additional operations
+     * @throws KubernetesConfigurationException if there is an error in configuring the Kubernetes
+     *                                          API client
+     */
     public NamespaceServiceImpl(
         CoreV1Api coreClient,
         KubernetesConfig kubernetesConfig,
@@ -52,6 +74,12 @@ public class NamespaceServiceImpl implements NamespaceService {
     }
 
 
+    /**
+     * Retrieves a list of all Kubernetes namespaces in the cluster.
+     *
+     * @return a Response object containing the list of namespace names
+     * @since 0.0.1
+     */
     @Override
     public Response<?> list() {
         try {
@@ -75,6 +103,13 @@ public class NamespaceServiceImpl implements NamespaceService {
         }
     }
 
+    /**
+     * Processes the Kubernetes namespace data and adds the namespace name to the provided list.
+     *
+     * @param data   the V1Namespace object containing the namespace data
+     * @param entity the list to which the namespace name will be added
+     * @since 0.0.1
+     */
     protected void processData(V1Namespace data, List<String> entity) {
         entity.add(Objects.requireNonNull(data.getMetadata()).getName());
     }

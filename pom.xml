@@ -16,8 +16,8 @@
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <!-- Artifact -->
-  <name>Bayu Dwiyan Satria Kubernetes Service</name>
-  <description>Bayu Dwiyan Satria Kubernetes Service</description>
+  <name>Bayu Dwiyan Satria Kube API Client</name>
+  <description>Bayu Dwiyan Satria Kube API Client</description>
   <url>https://github.com/bayudwiyansatria/kube-apiclient</url>
   <!-- Organization -->
   <organization>
@@ -26,7 +26,10 @@
   </organization>
   <inceptionYear/>
   <licenses>
-    <license/>
+    <license>
+      <name>MIT</name>
+      <url>https://opensource.org/licenses/MIT</url>
+    </license>
   </licenses>
   <developers>
     <developer>
@@ -126,6 +129,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.test.coverage.targetPercentage>70%</project.test.coverage.targetPercentage>
+    <!-- Other properties -->
     <!-- JVM Properties -->
     <java.version>17</java.version>
     <java.optimize>true</java.optimize>
