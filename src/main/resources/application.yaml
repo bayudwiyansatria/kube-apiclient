@@ -23,8 +23,8 @@ spring:
       url: https://opensource.org/licenses/MIT
     api:
       auth-token:
-        key: ${HTTP_AUTH_TOKEN_HEADER:X-API-KEY}
-        value: ${HTTP_AUTH_TOKEN_VALUE:-}
+        key: ${API_AUTH_TOKEN_HEADER:X-API-KEY}
+        value: ${API_AUTH_TOKEN_VALUE:-}
   cloud:
     kubernetes:
       client:
