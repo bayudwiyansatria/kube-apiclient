@@ -112,7 +112,7 @@ public class SecretServiceImpl implements SecretService {
      * @since 1.0.0
      */
     @Override
-    public Response<?> get(
+    public Response<?>  get(
         String namespace,
         String name
     ) {
@@ -176,6 +176,7 @@ public class SecretServiceImpl implements SecretService {
 
             // If get() returns 200, the secret exists
             if (existingSecret.getStatus() == HttpStatus.OK.value()) {
+                log.warn(LogMessages.Service.Secret.Exists.DYNAMIC, name);
                 return new Response<>(
                     LogMessages.Service.Secret.Exists.SIMPLE,
                     HttpStatus.CONFLICT.value(),
@@ -183,6 +184,7 @@ public class SecretServiceImpl implements SecretService {
                 );
             }
         } catch (KubernetesConfigurationException e) {
+            log.info(LogMessages.Service.Secret.NotFound.DYNAMIC, name);
             if (!e.getMessage().contains("\"code\":404")) {
                 throw e;
             }
@@ -258,29 +260,32 @@ public class SecretServiceImpl implements SecretService {
      * @since 1.0.0
      */
     @Override
-    public Response<?> deleteSecret(String namespace, String name) {
+    public Response<?> delete(String namespace, String name) {
         try {
             if (!isSecretExist(namespace, name)) {
                 log.info(LogMessages.Service.Secret.NotFound.DYNAMIC, name);
                 return new Response<>(
-                    LogMessages.Service.Secret.NotFound.SIMPLE,
+                    String.format(LogMessages.Service.Secret.NotFound.SIMPLE, name),
                     HttpStatus.NOT_FOUND.value(),
                     null
                 );
             }
 
-            log.info(LogMessages.Service.Secret.Exists.DYNAMIC, name);
+            log.info(LogMessages.Service.Secret.Found.DYNAMIC, name);
+
             // Delete the secret
             this.coreClient.deleteNamespacedSecret(name, namespace).execute();
 
+            log.info(LogMessages.Service.Secret.Deleted.DYNAMIC, name);
             return new Response<>(
-                LogMessages.Service.Secret.Exists.SIMPLE,
+                String.format(LogMessages.Service.Secret.Deleted.SIMPLE, name),
                 HttpStatus.OK.value(),
                 null
             );
-        } catch (Exception e) {
+        } catch (ApiException e) {
+            log.error(LogMessages.Service.Secret.Create.FAILED, e);
             return new Response<>(
-                LogMessages.Service.Secret.Delete.FAILED,
+                LogMessages.Service.Secret.Create.FAILED,
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 null
             );
@@ -433,10 +438,6 @@ public class SecretServiceImpl implements SecretService {
      */
     private boolean isSecretExist(String namespace, String name) {
         Response<?> existingSecret = this.get(namespace, name);
-        if (existingSecret != null && existingSecret.getStatus() == HttpStatus.OK.value()) {
-            log.info(LogMessages.Service.Secret.Exists.DYNAMIC, name);
-            return true;
-        }
-        return false;
+        return existingSecret != null && existingSecret.getStatus() == HttpStatus.OK.value();
     }
 }

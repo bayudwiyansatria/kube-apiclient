@@ -92,8 +92,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleKubernetesException(
         KubernetesConfigurationException e
     ) {
-        log.error(e.getMessage(), e);
-
         JsonNode errorBody = KubernetesErrorParser.parseResponseBody(e.getMessage());
 
         return new ResponseEntity<>(

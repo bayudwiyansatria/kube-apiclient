@@ -274,12 +274,12 @@ public final class LogMessages {
                 /**
                  * Logging messages related to secret not found operations.
                  */
-                public static final String DYNAMIC = "Secret not found: {}";
+                public static final String DYNAMIC = "Secret '{}' not found";
 
                 /**
                  * Logging messages related to simple secret not found operations.
                  */
-                public static final String SIMPLE = "Secret not found";
+                public static final String SIMPLE = "Secret '%s' not found";
             }
 
             /**
@@ -344,12 +344,44 @@ public final class LogMessages {
                 /**
                  * Logging messages related to simple secret deletion operations.
                  */
-                public static final String SIMPLE = "Secret deleted";
+                public static final String SIMPLE = "Secret deleted ";
 
                 /**
                  * Logging messages related to failed secret deletion operations.
                  */
                 public static final String FAILED = "Secret deletion failed";
+            }
+
+            /**
+             * Logging messages related to secret found scenarios.
+             */
+            public static class Found {
+
+                /**
+                 * Logging messages related to secret found operations.
+                 */
+                public static final String DYNAMIC = "Secret '{}' found, proceeding with deletion";
+
+                /**
+                 * Logging messages related to simple secret found operations.
+                 */
+                public static final String SIMPLE = "Secret '%s' found";
+            }
+
+            /**
+             * Logging messages related to secret deletion success.
+             */
+            public static class Deleted {
+
+                /**
+                 * Logging messages related to secret deletion operations.
+                 */
+                public static final String DYNAMIC = "Secret '{}' successfully deleted";
+
+                /**
+                 * Logging messages related to simple secret deletion operations.
+                 */
+                public static final String SIMPLE = "Secret '%s' successfully deleted";
             }
         }
     }

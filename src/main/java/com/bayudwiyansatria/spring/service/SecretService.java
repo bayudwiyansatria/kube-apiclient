@@ -97,5 +97,5 @@ public interface SecretService {
      * @return a {@link Response} object indicating the success or failure of the deletion operation
      * @since 0.0.1
      */
-    Response<?> deleteSecret(String namespace, String name);
+    Response<?> delete(String namespace, String name);
 }

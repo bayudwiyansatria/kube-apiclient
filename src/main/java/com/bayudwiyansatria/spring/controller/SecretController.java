@@ -182,7 +182,7 @@ public class SecretController {
     ) {
         log.info("Deleting secret with namespace: {} and name: {}", namespace, name);
         return ResponseEntity
-            .ok(secretService.deleteSecret(
+            .ok(secretService.delete(
                 namespace,
                 name
             ));
