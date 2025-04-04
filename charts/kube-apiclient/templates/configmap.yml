@@ -1,0 +1,15 @@
+{{- range .Values.envFrom }}
+{{- if .configMapRef }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .configMapRef.name }}
+  labels:
+    {{- include "kube-apiclient.labels" $ | nindent 4 }}
+data:
+  {{- with .data }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+---
+{{- end }}
+{{- end }}
