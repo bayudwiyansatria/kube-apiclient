@@ -4,11 +4,11 @@
 #-----------------------------------------------------------------------------------------------------------------------
 ---
 server:
+  error:
+    include-stacktrace: never
   port: ${SERVER_PORT:80}
   servlet:
     context-path: ${SERVER_CONTEXT_PATH:}
-  error:
-    include-stacktrace: never
 ---
 #-----------------------------------------------------------------------------------------------------------------------
 # Spring Config
@@ -18,13 +18,14 @@ spring:
   application:
     name: @project.artifactId@
     version: @project.version@
-    license:
-      name: MIT
-      url: https://opensource.org/licenses/MIT
     api:
+      url-pattern: ${API_URL_PATTERN:/api/*}
       auth-token:
         key: ${API_AUTH_TOKEN_HEADER:X-API-KEY}
         value: ${API_AUTH_TOKEN_VALUE:-}
+    license:
+      name: MIT
+      url: https://opensource.org/licenses/MIT
   cloud:
     kubernetes:
       client:
@@ -33,9 +34,9 @@ spring:
     mongodb:
       host: ${MONGODB_HOST:localhost}
       port: ${MONGODB_PORT:27017}
+      database: ${MONGODB_DATABASE:-}
       username: ${MONGODB_USERNAME:-}
       password: ${MONGODB_PASSWORD:-}
-      database: ${MONGODB_DATABASE:-}
       authentication-database: ${MONGODB_AUTHENTICATION_DATABASE:admin}
       ssl:
         enabled: ${MONGODB_SSL_ENABLED:false}
@@ -54,6 +55,7 @@ spring:
     defer-datasource-initialization: true
     hibernate:
       ddl-auto: update
+    open-in-view: off
   h2:
     console:
       enabled: true
@@ -74,12 +76,12 @@ springdoc:
     enabled: true
     path: ${SWAGGER_PATH:/swagger}
   paths-to-exclude:
-    - /v3/api-docs
-    - /v3/api-docs/*
-    - /swagger-ui/**
-    - /swagger-ui
-    - /actuator/**
-  paths-to-match: /api/**
+  - /v3/api-docs
+  - /v3/api-docs/*
+  - /swagger-ui/**
+  - /swagger-ui
+  - /actuator/**
+  paths-to-match: ${spring.application.api.url-pattern}
 ---
 #-----------------------------------------------------------------------------------------------------------------------
 # Management Config
@@ -113,9 +115,6 @@ logging:
         driver: WARN
     com:
       bayudwiyansatria: INFO
-  file:
-    name: ${logging.file.path}/spring.log
-    path: ${LOG_PATH:./.data/logs}
   pattern:
     file: "%d{yyyy-MM-dd HH:mm:ss} [%-5level] --- [%thread] %logger{36} : %msg%n"
 ---
@@ -133,6 +132,9 @@ logging:
   level:
     org:
       springframework: INFO
+  file:
+    name: ${logging.file.path}/spring.log
+    path: ${LOG_PATH:./.data/logs}
 ---
 spring:
   config:
@@ -143,12 +145,42 @@ spring:
   config:
     activate:
       on-profile: staging
+  h2:
+    console:
+      enabled: false
+  security:
+    user:
+      name: ${SECURITY_USERNAME:-}
+      password: ${SECURITY_PASSWORD:-}
+logging:
+  level:
+    org:
+      springframework: ERROR
+management:
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health
 ---
 spring:
   config:
     activate:
       on-profile: production
+  h2:
+    console:
+      enabled: false
+  security:
+    user:
+      name: ${SECURITY_USERNAME:-}
+      password: ${SECURITY_PASSWORD:-}
 logging:
   level:
     org:
       springframework: ERROR
+management:
+  endpoints:
+    web:
+      base-path: /
+      exposure:
+        include: health
