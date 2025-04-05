@@ -4,6 +4,7 @@ import com.bayudwiyansatria.spring.model.Response;
 import com.bayudwiyansatria.spring.model.entity.secrets.SecretEntity;
 import com.bayudwiyansatria.spring.model.request.RequestSecretEntity;
 import com.bayudwiyansatria.spring.service.SecretService;
+import com.bayudwiyansatria.spring.util.SecretEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -123,17 +124,40 @@ public class SecretController {
     public ResponseEntity<?> create(
         @RequestBody RequestSecretEntity request
     ) {
+        // Extract the details from the request object
         String namespace = request.getNamespace();
         String name = request.getName();
         String type = request.getType();
         List<SecretEntity> data = request.getData();
 
-        log.info("Creating secret with namespace: {}, name: {}", namespace, name);
+        // Log the creation request for debugging purposes
+        log.info("Creating secret with namespace: {}, name: {}, type: {}", namespace, name, type);
+
+        // Convert the type into a SecretEnum, handle any invalid types gracefully
+        SecretEnum secretTypeEnum;
+        try {
+            // Assuming the 'type' from the request maps directly to the SecretEnum name
+            secretTypeEnum = SecretEnum.valueOf(type);
+        } catch (IllegalArgumentException e) {
+            // If the type is not valid, handle this case, perhaps with a custom error response
+            return ResponseEntity
+                .badRequest()
+                .body(new Response<>(
+                    "Invalid secret type: " + type,
+                    HttpStatus.BAD_REQUEST.value(),
+                    null
+                ));
+        }
+
+        // Convert the SecretEnum to the corresponding Kubernetes value
+        String kubernetesType = secretTypeEnum.getKubernetesValue();
+
+        // Create the secret using the SecretService
         return ResponseEntity
             .ok(secretService.create(
                 namespace,
                 name,
-                type,
+                kubernetesType,
                 data)
             );
     }
