@@ -1,5 +1,6 @@
-package com.bayudwiyansatria.spring.util;
+package com.bayudwiyansatria.spring.util.security;
 
+import com.bayudwiyansatria.spring.util.ApiKeyAuthentication;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;

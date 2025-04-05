@@ -112,7 +112,7 @@ public class SecretServiceImpl implements SecretService {
      * @since 1.0.0
      */
     @Override
-    public Response<?>  get(
+    public Response<?> get(
         String namespace,
         String name
     ) {
@@ -140,6 +140,7 @@ public class SecretServiceImpl implements SecretService {
                 new SecretsEntity(
                     namespace,
                     name,
+                    secret.getType(),
                     data
                 )
             );
@@ -200,6 +201,7 @@ public class SecretServiceImpl implements SecretService {
                 new HashMap<>(),
                 new HashMap<>()
             ));
+        secret.setType(type);
         secret.setKind("Secret");
 
         // Set the type of the secret
@@ -220,6 +222,7 @@ public class SecretServiceImpl implements SecretService {
                 new SecretsEntity(
                     namespace,
                     name,
+                    type,
                     secretData
                 )
             );
@@ -324,7 +327,7 @@ public class SecretServiceImpl implements SecretService {
     }
 
     /**
-     * Processes an individual secret and adds it to the secrets collection.
+     * Processes an individual secret and adds it to the secrets' collection.
      *
      * @param secret        the Kubernetes secret to process
      * @param secretsEntity the collection to add the processed secret to
@@ -332,6 +335,7 @@ public class SecretServiceImpl implements SecretService {
     protected void processSecret(V1Secret secret, List<SecretsEntity> secretsEntity) {
         String name = Objects.requireNonNull(secret.getMetadata()).getName();
         String namespace = Objects.requireNonNull(secret.getMetadata()).getNamespace();
+        String type = Objects.requireNonNull(secret.getType());
 
         if (isValidSecret(secret)) {
             List<SecretEntity> secretData = new ArrayList<>();
@@ -349,7 +353,12 @@ public class SecretServiceImpl implements SecretService {
                 }
             });
 
-            secretsEntity.add(new SecretsEntity(namespace, name, secretData));
+            secretsEntity.add(new SecretsEntity(
+                namespace,
+                name,
+                type,
+                secretData)
+            );
         }
     }
 

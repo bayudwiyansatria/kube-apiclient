@@ -9,8 +9,8 @@
  *
  * <h2>Key Components</h2>
  * <ul>
- *   <li>{@link com.bayudwiyansatria.spring.util.ApiKeyAuthentication}: Handles the authentication process using an API key to interact with the Kubernetes API.</li>
- *   <li>{@link com.bayudwiyansatria.spring.util.KubernetesErrorParser}: Provides utilities to parse and handle error responses from the Kubernetes API.</li>
+ *   <li>{@link com.bayudwiyansatria.spring.util.security.ClientIpCaptureFilter}: A custom filter for Capturing Client API.</li>
+ *   <li>{@link com.bayudwiyansatria.spring.util.security.ServerApiKeyAuthenticationFilter}: A custom filter for authenticating API requests based on the server's API key.</li>
  * </ul>
  *
  * <h2>Features</h2>
@@ -28,4 +28,4 @@
  * @author Bayu Dwiyan Satria
  * @version 1.0.0
  */
-package com.bayudwiyansatria.spring.util;
+package com.bayudwiyansatria.spring.util.security;

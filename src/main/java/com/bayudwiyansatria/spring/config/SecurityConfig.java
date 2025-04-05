@@ -1,8 +1,10 @@
 package com.bayudwiyansatria.spring.config;
 
-import com.bayudwiyansatria.spring.util.ServerApiKeyAuthenticationFilter;
+import com.bayudwiyansatria.spring.util.security.ClientIpCaptureFilter;
+import com.bayudwiyansatria.spring.util.security.ServerApiKeyAuthenticationFilter;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -10,7 +12,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * SecurityConfig
@@ -58,6 +59,9 @@ public class SecurityConfig {
     @Value("${spring.application.api.auth-token.value}")
     private String principalRequestValue;
 
+    @Value("${spring.application.api.url-pattern}")
+    private String urlPattern;
+
     /**
      * Configures the security filter chain.
      * <p>
@@ -67,7 +71,6 @@ public class SecurityConfig {
      * <ul>
      *   <li>Disables CSRF protection as the application is stateless and does not require cookies or sessions.</li>
      *   <li>Configures session management to be stateless, meaning no sessions will be created or used.</li>
-     *   <li>Registers the custom {@link ServerApiKeyAuthenticationFilter} to intercept requests and validate the API key.</li>
      *   <li>Excludes Swagger UI and API documentation from authentication, allowing unauthenticated access.</li>
      *   <li>Requires authentication for all other API requests.</li>
      * </ul>
@@ -81,7 +84,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             // Security filter chain
-            .securityMatcher("/api/**")
+            .securityMatcher(this.urlPattern)
 
             // CSRF protection is disabled
             .csrf(AbstractHttpConfigurer::disable)
@@ -90,15 +93,6 @@ public class SecurityConfig {
             .sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-            // Add API Key filter before other filters
-            .addFilterBefore(
-                new ServerApiKeyAuthenticationFilter(
-                    principalRequestHeader,
-                    principalRequestValue
-                ),
-                UsernamePasswordAuthenticationFilter.class
-            )
-
             // Ignore authentication for the Swagger UI and API docs
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
@@ -106,5 +100,53 @@ public class SecurityConfig {
             );
 
         return http.build();
+    }
+
+    /**
+     * Registers custom filters in the Spring Boot application using {@link FilterRegistrationBean}.
+     * These filters are used to capture client IP addresses and authenticate API requests using an
+     * API key.
+     *
+     * @return a {@link FilterRegistrationBean} for {@link ClientIpCaptureFilter}, which is used to
+     * register the {@link ClientIpCaptureFilter} filter in the Spring Boot application.
+     * @see FilterRegistrationBean
+     * @see ClientIpCaptureFilter
+     * @see ServerApiKeyAuthenticationFilter
+     * @see jakarta.servlet.Filter
+     */
+    @Bean
+    public FilterRegistrationBean<ClientIpCaptureFilter> clientIpCaptureFilter() {
+        FilterRegistrationBean<ClientIpCaptureFilter> registrationBean = new FilterRegistrationBean<>();
+
+        registrationBean.setFilter(new ClientIpCaptureFilter());
+        registrationBean.addUrlPatterns(this.urlPattern);
+        registrationBean.setOrder(1);
+
+        return registrationBean;
+    }
+
+    /**
+     * Registers the {@link ServerApiKeyAuthenticationFilter} in the Spring Boot application for API
+     * key authentication. This filter checks if the incoming request contains a valid API key in
+     * the request headers.
+     *
+     * @return a {@link FilterRegistrationBean} for {@link ServerApiKeyAuthenticationFilter}, which
+     * is used to register the {@link ServerApiKeyAuthenticationFilter} filter in the Spring Boot
+     * application.
+     * @see FilterRegistrationBean
+     * @see ServerApiKeyAuthenticationFilter
+     * @see jakarta.servlet.Filter
+     */
+    @Bean
+    public FilterRegistrationBean<ServerApiKeyAuthenticationFilter> apiKeyFilter() {
+        FilterRegistrationBean<ServerApiKeyAuthenticationFilter> registrationBean = new FilterRegistrationBean<>();
+
+        registrationBean.setFilter(new ServerApiKeyAuthenticationFilter(
+            principalRequestHeader,
+            principalRequestValue)
+        );
+        registrationBean.addUrlPatterns(this.urlPattern);
+        registrationBean.setOrder(2);
+        return registrationBean;
     }
 }

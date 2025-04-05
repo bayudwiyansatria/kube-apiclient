@@ -1,6 +1,7 @@
 package com.bayudwiyansatria.spring.model.request;
 
 import com.bayudwiyansatria.spring.model.entity.secrets.SecretEntity;
+import com.bayudwiyansatria.spring.util.SecretEnum;
 import java.util.List;
 import lombok.Data;
 
@@ -43,7 +44,7 @@ public class RequestSecretEntity {
      * secrets are used for storing arbitrary data such as passwords, OAuth tokens, etc.
      * </p>
      */
-    private String type = "Opaque";
+    private String type = SecretEnum.OPAQUE.getKubernetesValue().toUpperCase();
 
     /**
      * The key-value pairs representing the data of the Kubernetes secret.

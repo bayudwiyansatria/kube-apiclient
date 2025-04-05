@@ -49,6 +49,16 @@ public class SecretsEntity {
     private String name;
 
     /**
+     * The type of the Kubernetes secret.
+     * <p>
+     * This field indicates the type of the secret, which can be one of several predefined types
+     * such as Opaque, DockerConfigJson, etc. The type helps Kubernetes understand how to handle the
+     * secret data.
+     * </p>
+     */
+    private String type;
+
+    /**
      * A list of key-value pairs representing the secrets.
      * <p>
      * This field contains a list of {@link SecretEntity} objects. Each object in the list
