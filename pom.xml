@@ -146,7 +146,7 @@
     <arguments/>
     <!-- Dependencies Properties -->
     <!-- Plugins Properties -->
-    <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+    <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
     <!-- Additional Properties -->
     <kubernetes-client.version>23.0.0</kubernetes-client.version>
     <jetbrain.version>26.0.2</jetbrain.version>
