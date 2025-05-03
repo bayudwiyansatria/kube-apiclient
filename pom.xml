@@ -14,7 +14,7 @@
   <!-- Packages -->
   <groupId>com.bayudwiyansatria.spring</groupId>
   <artifactId>kube-apiclient</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
   <!-- Artifact -->
   <name>Bayu Dwiyan Satria Kube API Client</name>
