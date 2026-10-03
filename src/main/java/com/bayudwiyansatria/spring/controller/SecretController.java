@@ -137,7 +137,7 @@ public class SecretController {
         SecretEnum secretTypeEnum;
         try {
             // Assuming the 'type' from the request maps directly to the SecretEnum name
-            secretTypeEnum = SecretEnum.valueOf(type);
+            secretTypeEnum = SecretEnum.fromValue(type);
         } catch (IllegalArgumentException e) {
             // If the type is not valid, handle this case, perhaps with a custom error response
             return ResponseEntity
@@ -163,9 +163,7 @@ public class SecretController {
     }
 
     /**
-     * Endpoint to update an existing Kubernetes secret. This method is currently not implemented.
-     * In the future, it will interact with the {@link SecretService} to update the secret details
-     * based on the provided namespace, name, and updated request.
+     * Creates or updates a Kubernetes secret.
      *
      * @param namespace the namespace of the secret to be updated
      * @param name      the name of the secret to be updated
@@ -179,15 +177,26 @@ public class SecretController {
         @PathVariable String name,
         @RequestBody RequestSecretEntity request
     ) {
-        log.warn("Update secret endpoint is not implemented yet for namespace: {} and name: {}",
-            namespace, name);
+        SecretEnum secretType;
+        try {
+            secretType = SecretEnum.fromValue(request.getType());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                .badRequest()
+                .body(new Response<>(
+                    "Invalid secret type: " + request.getType(),
+                    HttpStatus.BAD_REQUEST.value(),
+                    null
+                ));
+        }
 
-        return ResponseEntity
-            .ok(new Response<>(
-                "Update Secret",
-                HttpStatus.NOT_IMPLEMENTED.value(),
-                null
-            ));
+        Response<?> response = secretService.update(
+            namespace,
+            name,
+            secretType.getKubernetesValue(),
+            request.getData()
+        );
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 
     /**

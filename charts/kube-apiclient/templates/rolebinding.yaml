@@ -1,0 +1,20 @@
+{{- if .Values.rbac.create }}
+{{- range .Values.rbac.targetNamespaces }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "kube-apiclient.fullname" $ }}-secret-reconciler
+  namespace: {{ . }}
+  labels:
+    {{- include "kube-apiclient.labels" $ | nindent 4 }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "kube-apiclient.serviceAccountName" $ }}
+    namespace: {{ $.Release.Namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "kube-apiclient.fullname" $ }}-secret-reconciler
+---
+{{- end }}
+{{- end }}

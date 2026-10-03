@@ -2,28 +2,37 @@ name: Main
 on:
   push:
     branches:
-    - master
+      - master
   pull_request:
     branches:
-    - master
+      - master
     types:
-    - opened
-    - reopened
+      - opened
+      - reopened
 permissions:
   contents: read
+  packages: write
   pull-requests: write
   id-token: write
   pages: write
 jobs:
   #---------------------------------------------------------------------------------------------------------------------
+  # Code Analysis: Secret Detection
+  #---------------------------------------------------------------------------------------------------------------------
+  secret-detection:
+    name: Secret Detection
+    uses: bayudwiyansatria/.github/.github/workflows/code-analysis-secret.yml@master
+  #---------------------------------------------------------------------------------------------------------------------
   # Build
   #---------------------------------------------------------------------------------------------------------------------
   build:
     name: Build
+    needs:
+      - secret-detection
     uses: bayudwiyansatria/.github/.github/workflows/build-java-maven.yml@master
     with:
       JAVA_VERSION: 21
-      MAVEN_COMMAND: mvn --no-transfer-progress --file pom.xml --settings settings.xml clean package -DskipTests 
+      MAVEN_COMMAND: mvn --no-transfer-progress --file pom.xml --settings settings.xml clean package -DskipTests
     secrets:
       MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
       MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
@@ -32,6 +41,8 @@ jobs:
   #---------------------------------------------------------------------------------------------------------------------
   test:
     name: Test
+    needs:
+      - secret-detection
     uses: bayudwiyansatria/.github/.github/workflows/build-java-maven.yml@master
     with:
       JAVA_VERSION: 21
@@ -46,6 +57,8 @@ jobs:
   #---------------------------------------------------------------------------------------------------------------------
   docs:
     name: Build Documentation
+    needs:
+      - secret-detection
     uses: bayudwiyansatria/.github/.github/workflows/build-java-maven.yml@master
     with:
       JAVA_VERSION: 21
@@ -60,22 +73,29 @@ jobs:
   #---------------------------------------------------------------------------------------------------------------------
   maven-version:
     name: Set Maven Version
+    needs:
+      - secret-detection
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.versions.outputs.version }}
+      docker-tag: ${{ steps.docker-tag.outputs.tag }}
     steps:
-    - name: Get Maven Version
-      id: versions
-      uses: bayudwiyansatria/.github/actions/maven-get-version@master
-      with:
-        java-version: 21
+      - name: Get Maven Version
+        id: versions
+        uses: bayudwiyansatria/.github/actions/maven-get-version@master
+        with:
+          java-version: 21
+      - name: Get Docker Tag
+        id: docker-tag
+        shell: bash
+        run: printf 'tag=%s\n' "$(git rev-parse --short "${GITHUB_SHA}")" >> "${GITHUB_OUTPUT}"
   #---------------------------------------------------------------------------------------------------------------------
   # Code Quality
   #---------------------------------------------------------------------------------------------------------------------
   code-quality:
     name: Code Quality
-    needs: 
-    - test
+    needs:
+      - test
     uses: bayudwiyansatria/.github/.github/workflows/code-analysis-codecov.yml@master
     with:
       ARTIFACT_NAME: coverage
@@ -85,29 +105,46 @@ jobs:
   #---------------------------------------------------------------------------------------------------------------------
   # Deploy
   #---------------------------------------------------------------------------------------------------------------------
-  # docker:
-  #   name: Docker
-  #   needs: 
-  #   - build
-  #   - maven-version
-  #   uses: bayudwiyansatria/.github/.github/workflows/build-docker.yml@master
-  #   with:
-  #     DOCKER_REGISTRY: docker.io
-  #     DOCKER_FILE: docker/ci.Dockerfile
-  #     DOCKER_IMAGE_TAG: ${{ needs.maven-version.outputs.version }}
-  #     DOCKER_BUILD_ARG: VERSION=${{ needs.maven-version.outputs.version }}
-  #     PUSH_ENABLED: true
-  #     ARTIFACT_ENABLED: true
-  #     ARTIFACT_NAME: target
-  #     ARTIFACT_PATH: target
-  #   secrets:
-  #     DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-  #     DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  docker:
+    name: Docker Hub
+    if: ${{ github.event_name == 'push' }}
+    needs:
+      - build
+      - maven-version
+    uses: bayudwiyansatria/.github/.github/workflows/build-docker.yml@master
+    with:
+      DOCKER_REGISTRY: docker.io
+      DOCKER_FILE: docker/ci.Dockerfile
+      DOCKER_IMAGE_TAG: ${{ needs.maven-version.outputs.docker-tag }}
+      PUSH_ENABLED: true
+      ARTIFACT_ENABLED: true
+      ARTIFACT_NAME: target
+      ARTIFACT_PATH: target
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  docker-ghcr:
+    name: GHCR
+    if: ${{ github.event_name == 'push' }}
+    needs:
+      - docker
+      - maven-version
+    uses: bayudwiyansatria/.github/.github/workflows/build-docker.yml@master
+    with:
+      RETAGING_ONLY: true
+      SOURCE_DOCKER_REPOSITORY: docker.io/${{ github.repository }}:${{ needs.maven-version.outputs.docker-tag }}
+      DOCKER_REGISTRY: ghcr.io
+      DOCKER_IMAGE_TAG: ${{ needs.maven-version.outputs.docker-tag }}
+      PUSH_ENABLED: true
+      ARTIFACT_ENABLED: false
+    secrets:
+      DOCKER_USERNAME: ${{ github.actor }}
+      DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
   deploy:
     name: Deploy
     uses: bayudwiyansatria/.github/.github/workflows/deploy-maven.yml@master
-    needs: 
-    - build
+    needs:
+      - build
     with:
       JAVA_VERSION: 21
     secrets:
@@ -116,7 +153,7 @@ jobs:
   # github-pages:
   #   name: GitHub Pages
   #   uses: bayudwiyansatria/.github/.github/workflows/release-github-pages.yml@master
-  #   needs: 
+  #   needs:
   #   - build
   #   with:
   #     ARTIFACT_NAME: docs

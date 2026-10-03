@@ -2,33 +2,43 @@ name: Features
 on:
   push:
     branches:
-    - feature/*
-    - hotfix/*
-    - bugfix/*
+      - feature/*
+      - hotfix/*
+      - bugfix/*
   pull_request:
     branches:
-    - develop
+      - develop
     types:
-    - opened
-    - reopened
+      - opened
+      - reopened
 permissions:
   contents: read
   pull-requests: write
 jobs:
   #---------------------------------------------------------------------------------------------------------------------
+  # Code Analysis: Secret Detection
+  #---------------------------------------------------------------------------------------------------------------------
+  secret-detection:
+    name: Secret Detection
+    uses: bayudwiyansatria/.github/.github/workflows/code-analysis-secret.yml@master
+  #---------------------------------------------------------------------------------------------------------------------
   # Build
   #---------------------------------------------------------------------------------------------------------------------
   build:
     name: Build
+    needs:
+      - secret-detection
     uses: bayudwiyansatria/.github/.github/workflows/build-java-maven.yml@master
     with:
       JAVA_VERSION: 21
-      MAVEN_COMMAND: mvn --no-transfer-progress --file pom.xml --settings settings.xml clean package -DskipTests 
+      MAVEN_COMMAND: mvn --no-transfer-progress --file pom.xml --settings settings.xml clean package -DskipTests
     secrets:
       MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
       MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
   test:
     name: Test
+    needs:
+      - secret-detection
     uses: bayudwiyansatria/.github/.github/workflows/build-java-maven.yml@master
     with:
       JAVA_VERSION: 21
@@ -43,8 +53,8 @@ jobs:
   #---------------------------------------------------------------------------------------------------------------------
   code-quality:
     name: Code Quality
-    needs: 
-    - test
+    needs:
+      - test
     uses: bayudwiyansatria/.github/.github/workflows/code-analysis-codecov.yml@master
     with:
       ARTIFACT_NAME: coverage

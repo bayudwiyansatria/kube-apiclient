@@ -244,9 +244,46 @@ public class SecretServiceImpl implements SecretService {
      * @since 1.0.0
      */
     @Override
-    public Response<?> updateSecret() {
-        // TODO
-        return null;
+    public Response<?> update(
+        String namespace,
+        String name,
+        String type,
+        List<SecretEntity> secretData
+    ) {
+        V1Secret secret;
+        try {
+            secret = this.coreClient.readNamespacedSecret(name, namespace).execute();
+        } catch (ApiException e) {
+            if (e.getCode() == HttpStatus.NOT_FOUND.value()) {
+                return this.create(namespace, name, type, secretData);
+            }
+            throw new KubernetesConfigurationException(e.getMessage());
+        }
+
+        Map<String, String> data = new HashMap<>();
+        for (SecretEntity secretEntity : secretData) {
+            data.put(secretEntity.getKey(), secretEntity.getValue());
+        }
+
+        secret.setType(type);
+        secret.setData(null);
+        secret.setStringData(data);
+
+        try {
+            this.coreClient.replaceNamespacedSecret(name, namespace, secret).execute();
+            return new Response<>(
+                "Secret updated successfully",
+                HttpStatus.OK.value(),
+                new SecretsEntity(namespace, name, type, secretData)
+            );
+        } catch (ApiException e) {
+            log.error("Failed to update secret {} in namespace {}", name, namespace, e);
+            return new Response<>(
+                "Failed to update secret",
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                null
+            );
+        }
     }
 
     /**

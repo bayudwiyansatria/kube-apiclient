@@ -5,8 +5,8 @@ apiVersion: v2
 name: kube-apiclient
 description: Spring Boot application for managing Kubernetes resources, featuring seamless integration with the Kubernetes API, pre-configured setups, and REST API endpoints for managing secrets.
 type: application
-version: 0.1.0
-appVersion: 0.1.0
+version: 1.0.1
+appVersion: 1.0.1
 
 #-----------------------------------------------------------------------------------------------------------------------
 # Chart Dependencies

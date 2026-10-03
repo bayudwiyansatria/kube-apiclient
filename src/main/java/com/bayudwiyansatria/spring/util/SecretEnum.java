@@ -70,4 +70,15 @@ public enum SecretEnum {
         this.kubernetesValue = kubernetesValue;
     }
 
+    public static SecretEnum fromValue(String value) {
+        for (SecretEnum secretType : values()) {
+            if (secretType.name().equalsIgnoreCase(value)
+                || secretType.value.equalsIgnoreCase(value)
+                || secretType.kubernetesValue.equalsIgnoreCase(value)) {
+                return secretType;
+            }
+        }
+        throw new IllegalArgumentException("Unsupported Kubernetes Secret type: " + value);
+    }
+
 }
