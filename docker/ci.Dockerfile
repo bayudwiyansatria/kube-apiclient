@@ -1,9 +1,9 @@
 #-----------------------------------------------------------------------------------------------------------------------
 # Docker Base
 #-----------------------------------------------------------------------------------------------------------------------
-  FROM openjdk:21-slim-buster AS base
-  LABEL maintainer="bayudwiyansatria@gmail.com"
-  WORKDIR /app
+FROM openjdk:21-ea-34-jdk-slim-bookworm AS base
+LABEL maintainer="bayudwiyansatria@gmail.com"
+WORKDIR /app
     
 #-----------------------------------------------------------------------------------------------------------------------
 # Docker Build
@@ -26,4 +26,3 @@ COPY --from=build /build/app.jar app.jar
 EXPOSE 80
 
 ENTRYPOINT [ "java", "-jar" ,"app.jar" ]
-  

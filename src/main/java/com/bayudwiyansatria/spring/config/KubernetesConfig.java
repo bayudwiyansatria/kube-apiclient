@@ -8,6 +8,8 @@ import io.kubernetes.client.openapi.apis.VersionApi;
 import io.kubernetes.client.util.Config;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +80,13 @@ public class KubernetesConfig {
     @PostConstruct
     public void init() {
         try {
-            this.apiClient = Config.fromConfig(this.kubeConfig);
+            if (this.kubeConfig == null || this.kubeConfig.isBlank()) {
+                this.apiClient = Config.defaultClient();
+            } else {
+                this.apiClient = Config.fromConfig(
+                    Files.newBufferedReader(Path.of(this.kubeConfig))
+                );
+            }
             io.kubernetes.client.openapi.Configuration.setDefaultApiClient(this.apiClient);
         } catch (IOException e) {
             logger.error(LogMessages.Configuration.Kubernetes.Config.INIT_FAILED, e);

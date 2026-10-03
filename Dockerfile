@@ -1,7 +1,7 @@
 #-----------------------------------------------------------------------------------------------------------------------
 # Docker Base
 #-----------------------------------------------------------------------------------------------------------------------
-FROM openjdk:21-slim-buster AS base
+FROM openjdk:21-ea-34-jdk-slim-bookworm AS base
 LABEL maintainer="bayudwiyansatria@gmail.com"
 WORKDIR /app
   

@@ -84,7 +84,12 @@ public interface SecretService {
      * @return a {@link Response} object containing a list of updated {@link SecretsEntity}
      * @since 0.0.1
      */
-    Response<?> updateSecret();
+    Response<?> update(
+        String namespace,
+        String name,
+        String type,
+        List<SecretEntity> data
+    );
 
     /**
      * Deletes a specific Kubernetes secret by its namespace and name.

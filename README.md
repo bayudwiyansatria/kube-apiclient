@@ -1,11 +1,11 @@
 # Kube API Client for Spring Boot
 
+[![Main](https://github.com/bayudwiyansatria/kube-apiclient/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/bayudwiyansatria/kube-apiclient/actions/workflows/main.yml)
+[![codecov](https://codecov.io/gh/bayudwiyansatria/kube-apiclient/graph/badge.svg)](https://codecov.io/gh/bayudwiyansatria/kube-apiclient)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v2.1%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
+[![License](https://img.shields.io/github/license/bayudwiyansatria/kube-apiclient)](LICENSE)
+
 ![Platforms](https://img.shields.io/badge/%20Platforms-Windows%20/%20Linux-blue.svg?style=flat-square)
-[![License](https://img.shields.io/badge/%20Licence-MIT-green.svg?style=flat-square)](LICENSE)
-[![Code Of Conduct](https://img.shields.io/badge/Community-Code%20of%20Conduct-orange.svg?style=flat-square)](CODE_OF_CONDUCT.md)
-[![Support](https://img.shields.io/badge/Community-Support-red.svg?style=flat-square)](SUPPORT.md)
-[![Contributing](https://img.shields.io/badge/%20Community-Contribution-yellow.svg?style=flat-square)](CONTRIBUTING.md)
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-v1.4%20adopted-ff69b4.svg)](CODE_OF_CONDUCT.md)
 
 A Spring Boot project for managing Kubernetes resources such as secrets. This repository provides a structured starting point for integrating Kubernetes API with Spring Boot applications.
 
@@ -75,13 +75,19 @@ To set up the development environment, follow these steps:
 
 ## Usage
 
-1. **Configure Kubernetes Access**:
+When deployed in Kubernetes, leave `KUBERNETES_CONFIG_FILE_PATH` empty. The application then uses
+the pod service account. Configure namespace-scoped Roles and RoleBindings for only the Secrets the
+service is expected to reconcile. Set `KUBERNETES_CONFIG_FILE_PATH` only for local development with
+an explicit kubeconfig file.
 
+`PUT /api/v1/secret/{namespace}/{name}` is an idempotent upsert operation: it creates a missing
+Secret and replaces the data of an existing Secret.
+
+1. **Configure Kubernetes Access**:
    - Ensure your Kubernetes cluster is accessible via `kubectl`.
    - Update the `application.yml` file with your Kubernetes configuration.
 
 2. **Run the Application**:
-
    - Start the Spring Boot application using the command:
      ```bash
      java -jar target/kube-apiclient-0.1.0.jar

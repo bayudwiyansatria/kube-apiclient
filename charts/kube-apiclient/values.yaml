@@ -47,6 +47,11 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template.
   name: ""
 
+# Namespaces in which this API client may reconcile explicitly configured Secrets.
+rbac:
+  create: true
+  targetNamespaces: []
+
 #-----------------------------------------------------------------------------------------------------------------------
 # Pod Annotations and Labels
 #-----------------------------------------------------------------------------------------------------------------------
